@@ -1,0 +1,23 @@
+{% load static %}
+
+<form method="post">
+    {% csrf_token %}
+    <h3>Resume Details</h3>
+    {{ resume_form.as_p }}
+
+    <h3>Skills</h3>
+    {{ skill_formset.management_form }}
+    {% for form in skill_formset %}
+        {{ form.as_p }}
+        <hr>
+    {% endfor %}
+
+    <h3>Experience</h3>
+    {{ experience_formset.management_form }}
+    {% for form in experience_formset %}
+        {{ form.as_p }}
+        <hr>
+    {% endfor %}
+
+    <button type="submit">Save</button>
+</form>
