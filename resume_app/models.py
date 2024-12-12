@@ -7,6 +7,9 @@ class Resume(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     summary = models.TextField()
+    template_selected = models.ForeignKey(
+        "Template", on_delete=models.CASCADE, related_name="resumes", null=True
+    )
 
     def __str__(self):
         return f"[Resume] {self.full_name}"
@@ -40,11 +43,21 @@ class Experience(models.Model):
 
 class Template(models.Model):
     name = models.CharField(max_length=100)
-    html_structure = models.TextField()  # Aquí guardamos el diseño en HTML.
-    styles = models.JSONField(default=dict)  # Reglas CSS dinámicas.
-    resume = models.OneToOneField(
-        Resume, on_delete=models.CASCADE, related_name="template"
-    )
+    descripcion = models.TextField()
+    componet_name = models.CharField(max_length=100)
+    customazation_rules = models.JSONField(default=list)
 
     def __str__(self):
         return f"[Template] {self.name}"
+
+
+class ResumeTemplate(models.Model):
+    resume = models.ForeignKey(Resume, on_delete=models.CASCADE)
+    template = models.ForeignKey(Template, on_delete=models.CASCADE)
+    custom_styles = models.JSONField(default=list)
+
+
+class ResumeCustomization(models.Model):
+    resume = models.ForeignKey(Resume, on_delete=models.CASCADE)
+    template = models.ForeignKey(Template, on_delete=models.CASCADE)
+    custom_styles = models.JSONField(default=list)

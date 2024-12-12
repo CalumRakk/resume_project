@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Resume, Skill, Experience, Template
+from .models import Resume, Skill, Experience, Template, ResumeCustomization
 
 
 class ExperienceSerializer(serializers.ModelSerializer):
@@ -24,9 +24,25 @@ class ExperienceSerializer(serializers.ModelSerializer):
 
 
 class TemplateSerializer(serializers.ModelSerializer):
+    resume = serializers.HyperlinkedRelatedField(
+        view_name="resume-detail",
+        lookup_field="pk",
+        queryset=Resume.objects.all(),
+        required=False,
+        allow_null=True,
+    )
+
     class Meta:
         model = Template
-        fields = ["name", "html_structure", "styles"]
+        fields = [
+            "id",
+            "url",
+            "name",
+            "descripcion",
+            "componet_name",
+            "customazation_rules",
+            "resume",
+        ]
 
 
 class ResumeSerializer(serializers.ModelSerializer):
@@ -68,3 +84,22 @@ class SkillSerializer(serializers.ModelSerializer):
     class Meta:
         model = Skill
         fields = ["id", "url", "name", "level", "keywords", "resume"]
+
+
+class ResumeCustomizationSerializer(serializers.ModelSerializer):
+    resume = serializers.HyperlinkedRelatedField(
+        view_name="resume-detail", lookup_field="pk", queryset=Resume.objects.all()
+    )
+    template = serializers.HyperlinkedRelatedField(
+        view_name="template-detail", lookup_field="pk", queryset=Template.objects.all()
+    )
+
+    class Meta:
+        model = ResumeCustomization
+        fields = [
+            "id",
+            "url",
+            "resume",
+            "template",
+            "custom_styles",
+        ]
