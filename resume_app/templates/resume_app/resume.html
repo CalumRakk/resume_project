@@ -1,0 +1,61 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Resume</title>
+    <script id="__DATA__" type="application/json">
+
+        {{ user_resume|safe }}
+
+    </script>
+    <style>
+        #app {
+        display: flex;            
+        justify-content: center;  
+        align-items: center;      
+        height: 100vh;            
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+    <script src="{% static 'js/modern-resume.js' %}"></script>
+    <!-- <script src="{% static 'js/fetch-data.js' %}"></script> -->
+    <script>
+        function loader() {
+            const dataElement = document.getElementById("__DATA__");
+            const appContainer = document.getElementById("app");
+
+            if (!dataElement || !appContainer) {
+                console.error("El contenedor de datos o la aplicación no están definidos.");
+                return;
+            }
+
+            try {
+                const data = JSON.parse(dataElement.textContent);
+                const component_name = data.template_selected.componet_name;
+
+                if (!component_name.includes('-')) {
+                    console.error('El nombre del componente no es válido:', component_name);
+                    return;
+                }
+
+                const component = document.createElement(component_name);
+                component.state = data; // Asignar el JSON como propiedad
+
+                appContainer.appendChild(component);
+
+                if (typeof component.render === 'function') {
+                    component.render(); // Llamar a render si existe
+                }
+            } catch (error) {
+                console.error("Error al procesar los datos:", error);
+            }
+        }
+        loader();
+
+    </script>
+</body>
+</html>

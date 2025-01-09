@@ -24,13 +24,13 @@ class ExperienceSerializer(serializers.ModelSerializer):
 
 
 class TemplateSerializer(serializers.ModelSerializer):
-    resume = serializers.HyperlinkedRelatedField(
-        view_name="resume-detail",
-        lookup_field="pk",
-        queryset=Resume.objects.all(),
-        required=False,
-        allow_null=True,
-    )
+    # resume = serializers.HyperlinkedRelatedField(
+    #     view_name="resume-detail",
+    #     lookup_field="pk",
+    #     queryset=Resume.objects.all(),
+    #     required=False,
+    #     allow_null=True,
+    # )
 
     class Meta:
         model = Template
@@ -41,7 +41,7 @@ class TemplateSerializer(serializers.ModelSerializer):
             "descripcion",
             "componet_name",
             "customazation_rules",
-            "resume",
+            # "resume",
         ]
 
 
@@ -58,7 +58,7 @@ class ResumeSerializer(serializers.ModelSerializer):
         view_name="experience-detail",
         lookup_field="pk",
     )
-    template = serializers.PrimaryKeyRelatedField(
+    template_selected = serializers.PrimaryKeyRelatedField(
         queryset=Template.objects.all(), required=False
     )
 
@@ -72,7 +72,7 @@ class ResumeSerializer(serializers.ModelSerializer):
             "summary",
             "skills",
             "experiences",
-            "template",
+            "template_selected",
         ]
 
 

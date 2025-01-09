@@ -1,4 +1,10 @@
 from rest_framework import viewsets
+from django.db.models import Prefetch
+import json
+from django.shortcuts import render
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from .models import Resume, Template, Skill, Experience, ResumeCustomization
 from .serializers import (
     TemplateSerializer,
@@ -7,6 +13,43 @@ from .serializers import (
     ExperienceSerializer,
     ResumeCustomizationSerializer,
 )
+
+# views.py
+from django.shortcuts import render
+from rest_framework.views import APIView
+from rest_framework.response import Response
+
+
+class ResumeAPIView(APIView):
+    def get(self, request, resume_id):
+        resume = Resume.objects.get(pk=resume_id)
+        resume_serializer = ResumeSerializer(resume, context={"request": request})
+        resume_data = resume_serializer.data
+
+        template = Template.objects.get(pk=resume.template_selected.pk)
+        template_serializer = TemplateSerializer(template, context={"request": request})
+        template_data = template_serializer.data
+        data = {
+            "resume": resume_data,
+            "template_selected": template_data,
+        }
+        return Response(data)
+
+
+def serve_resume_page(request, resume_id):
+    resume = Resume.objects.get(pk=resume_id)
+    resume_serializer = ResumeSerializer(resume, context={"request": request})
+    resume_data = resume_serializer.data
+
+    template = Template.objects.get(pk=resume.template_selected.pk)
+    template_serializer = TemplateSerializer(template, context={"request": request})
+    template_data = template_serializer.data
+    data = {
+        "resume": resume_data,
+        "template_selected": template_data,
+    }
+    json_data = json.dumps(data)
+    return render(request, "resume_app/resume.html", context={"user_resume": json_data})
 
 
 class ResumeViewSet(viewsets.ModelViewSet):
@@ -36,3 +79,10 @@ class TemplateViewSet(viewsets.ModelViewSet):
 class ResumeCustomizationViewSet(viewsets.ModelViewSet):
     queryset = ResumeCustomization.objects.all()
     serializer_class = ResumeCustomizationSerializer
+
+
+# Create your views here.
+@api_view(["GET"])
+def index(request, resume_id):
+
+    return render(request, "resume_app/index.html", {"resume_id": resume_id})
