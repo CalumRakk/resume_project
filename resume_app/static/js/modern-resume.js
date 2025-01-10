@@ -178,7 +178,7 @@ class ModernResume extends HTMLElement {
     input.value = currentValue;
     input.classList.add('editing');
 
-    const field = element.id.replace('-', '_');
+    const field = element.id ? element.id.replace('-', '_') : element.getAttribute("section_name");
     element.replaceWith(input);
     input.focus();
 
@@ -191,9 +191,10 @@ class ModernResume extends HTMLElement {
 
       if (field=== 'skills' || field === 'experiences') {
         const index= +currentElement.getAttribute("data-id");
+        const key= currentElement.getAttribute("data-key");
         const data= [...this.state[field]];
-        data[index]= newValue;
-        this.state[field]= data;
+        data[index][key]= newValue;
+        this.state[field]= data;      
       }
       if (field === 'full_name' || field === 'email' || field === 'summary') {
         this.state[field]= newValue;
@@ -214,6 +215,9 @@ class ModernResume extends HTMLElement {
     this.state[section_name]= data;
   }
 
+  addExperience() {
+    
+  }
   deleteItem(section_name, index) {
     const currentItems = this.state[section_name];
     const data= [...currentItems]
@@ -242,7 +246,7 @@ class ModernResume extends HTMLElement {
     if (skillsList) {
       skillsList.innerHTML = resume.skills.map((skill, index) => `
         <li>
-          <span id="skills" class="editable" data-id="${index}">${skill}</span>
+          <span section_name="skills" class="editable" data-id="${index}">${skill}</span>
           <span class="delete-btn">×</span>
         </li>
       `).join('');
@@ -252,8 +256,12 @@ class ModernResume extends HTMLElement {
     if (experiencesList) {
       experiencesList.innerHTML = resume.experiences.map((exp, index) => `
         <li>  
-          <span id="experiences" class="editable" data-id="${index}">${exp}</span>
-          <span class="delete-btn">×</span>
+          <article>
+            <h2 section_name="experiences" data-id="${index}" data-key="name" class="editable">${exp.name}</h2>
+            <a section_name="experiences" data-id="${index}" data-key="url" class="editable">${exp.url}</a>
+            <p section_name="experiences" data-id="${index}" data-key="summary" class="editable">${exp.summary}</p>         
+            <span class="delete-btn">×</span>
+          </article>
         </li>
       `).join('');
     }

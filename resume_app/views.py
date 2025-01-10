@@ -50,12 +50,13 @@ def serve_resume_page(request, resume_id):
         return Response(status=status.HTTP_200_OK)
 
     resume = Resume.objects.get(pk=resume_id)
-    resume_serializer = ResumeSerializer(resume, context={"request": request})
-    resume_data = resume_serializer.data
+    resume_data = ResumeSerializer(resume, context={"request": request}).data
+    resume_data["experiences"] = ExperienceSerializer(
+        resume.experiences.all(), many=True, context={"request": request}
+    ).data
 
     template = Template.objects.get(pk=resume.template_selected.pk)
-    template_serializer = TemplateSerializer(template, context={"request": request})
-    template_data = template_serializer.data
+    template_data = TemplateSerializer(template, context={"request": request}).data
     data = {
         "resume": resume_data,
         "template_selected": template_data,
