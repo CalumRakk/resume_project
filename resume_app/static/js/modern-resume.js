@@ -125,12 +125,9 @@ class ModernResume extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
-    this._data = new Proxy({}, {
+    this._resume = new Proxy({}, {
         set: (target, key, value) => {
             target[key] = value;
-            const isEmpty= !Array.from(window.customElements).length;
-            if (isEmpty) return true;
-
             this.render();
             return true;
         }
@@ -138,10 +135,10 @@ class ModernResume extends HTMLElement {
   }
 
   get state() {
-    return this._data;
+    return this._resume;
   }
   set state(value) {
-    Object.assign(this._data, value);
+    Object.assign(this._resume, value);
   }
   connectedCallback() {
     this.shadowRoot.appendChild(template.content.cloneNode(true));
@@ -192,11 +189,15 @@ class ModernResume extends HTMLElement {
 
       input.replaceWith(currentElement);
 
-      if (field === 'full_name' || field === 'email' || field === 'summary') {
-        this.state.resume[field]= newValue;
-        this.render();
+      if (field=== 'skills' || field === 'experiences') {
+        const index= +currentElement.getAttribute("data-id");
+        const data= [...this.state[field]];
+        data[index]= newValue;
+        this.state[field]= data;
       }
-      // this.render();
+      if (field === 'full_name' || field === 'email' || field === 'summary') {
+        this.state[field]= newValue;
+      }
     };
     const handleKeyPress = (e) => {
       if (e.key === 'Enter') {
@@ -207,9 +208,10 @@ class ModernResume extends HTMLElement {
     input.addEventListener('keypress', handleKeyPress);
   }
 
-  addItem(list, defaultValue) {
-    const currentItems = this.state.getState().resume[list];
-    this.state.updateField(`resume.${list}`, [...currentItems, defaultValue]);
+  addItem(section_name, defaultValue) {
+    const currentItems = this.state[section_name];
+    const data= [...currentItems, defaultValue]
+    this.state[section_name]= data;
   }
 
   deleteItem(list, index) {
@@ -219,27 +221,62 @@ class ModernResume extends HTMLElement {
   }
 
   render() {
-    const resume = this.state.resume;
+    const resume = this.state;
     
-    this.shadowRoot.querySelector("#full-name").textContent = resume.full_name;
-    this.shadowRoot.querySelector("#email").textContent = resume.email;
-    this.shadowRoot.querySelector("#summary").textContent = resume.summary;
+    const fullName = this.shadowRoot.querySelector("#full-name");
+    const email = this.shadowRoot.querySelector("#email");
+    const summary = this.shadowRoot.querySelector("#summary");
+
+    if (fullName && resume.full_name) {
+      fullName.textContent = resume.full_name;
+    }
+    if (email && resume.email) {
+      email.textContent = resume.email;
+    }
+    if (summary && resume.summary) {
+      summary.textContent = resume.summary;
+    }
 
     const skillsList = this.shadowRoot.querySelector("#skills");
-    skillsList.innerHTML = resume.skills.map(skill => `
-      <li>
-        <span class="editable">${skill}</span>
-        <span class="delete-btn">×</span>
-      </li>
-    `).join('');
+    if (skillsList) {
+      skillsList.innerHTML = resume.skills.map((skill, index) => `
+        <li>
+          <span id="skills" class="editable" data-id="${index}">${skill}</span>
+          <span class="delete-btn">×</span>
+        </li>
+      `).join('');
+    }
 
     const experiencesList = this.shadowRoot.querySelector("#experiences");
-    experiencesList.innerHTML = resume.experiences.map(exp => `
-      <li>
-        <span class="editable">${exp}</span>
-        <span class="delete-btn">×</span>
-      </li>
-    `).join('');
+    if (experiencesList) {
+      experiencesList.innerHTML = resume.experiences.map(exp => `
+        <li>  
+          <span class="editable">${exp}</span>
+          <span class="delete-btn">×</span>
+        </li>
+      `).join('');
+    }
+
+
+    // this.shadowRoot.querySelector("#full-name").textContent = resume.full_name;
+    // this.shadowRoot.querySelector("#email").textContent = resume.email;
+    // this.shadowRoot.querySelector("#summary").textContent = resume.summary;
+
+    // const skillsList = this.shadowRoot.querySelector("#skills");
+    // skillsList.innerHTML = resume.skills.map(skill => `
+    //   <li>
+    //     <span class="editable">${skill}</span>
+    //     <span class="delete-btn">×</span>
+    //   </li>
+    // `).join('');
+
+    // const experiencesList = this.shadowRoot.querySelector("#experiences");
+    // experiencesList.innerHTML = resume.experiences.map(exp => `
+    //   <li>
+    //     <span class="editable">${exp}</span>
+    //     <span class="delete-btn">×</span>
+    //   </li>
+    // `).join('');
   }
 }
 
