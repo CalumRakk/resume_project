@@ -53,10 +53,11 @@ def serve_resume_page(request, resume_id):
         # experiencias_actuales = resume.experiences.all()
 
         experiences_ids = []
-        for orden, experiencia_data in enumerate(data["experiences"]):
+        for orden, experiencia_data in enumerate(data["experiences"], 1):
 
             if experiencia_data.get("id"):
                 experiencia = Experience.objects.get(pk=experiencia_data["id"])
+                experiencia.orden = orden
                 experiencia.name = experiencia_data["name"]
                 experiencia.url = experiencia_data["url"]
                 experiencia.summary = experiencia_data["summary"]
