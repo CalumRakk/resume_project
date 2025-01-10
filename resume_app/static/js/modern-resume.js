@@ -214,10 +214,11 @@ class ModernResume extends HTMLElement {
     this.state[section_name]= data;
   }
 
-  deleteItem(list, index) {
-    const currentItems = this.state.getState().resume[list];
-    const newItems = currentItems.filter((_, i) => i !== index);
-    this.state.updateField(`resume.${list}`, newItems);
+  deleteItem(section_name, index) {
+    const currentItems = this.state[section_name];
+    const data= [...currentItems]
+    data.pop(index);
+    this.state[section_name]= data;
   }
 
   render() {
@@ -249,9 +250,9 @@ class ModernResume extends HTMLElement {
 
     const experiencesList = this.shadowRoot.querySelector("#experiences");
     if (experiencesList) {
-      experiencesList.innerHTML = resume.experiences.map(exp => `
+      experiencesList.innerHTML = resume.experiences.map((exp, index) => `
         <li>  
-          <span class="editable">${exp}</span>
+          <span id="experiences" class="editable" data-id="${index}">${exp}</span>
           <span class="delete-btn">×</span>
         </li>
       `).join('');
