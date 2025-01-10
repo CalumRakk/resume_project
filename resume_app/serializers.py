@@ -19,6 +19,7 @@ class ExperienceSerializer(serializers.ModelSerializer):
             "start_date",
             "end_date",
             "resume",
+            "orden",
         ]
         excludes = ["url"]
 

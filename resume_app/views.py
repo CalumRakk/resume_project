@@ -14,6 +14,7 @@ from .serializers import (
     ResumeCustomizationSerializer,
 )
 from django.views.decorators.csrf import csrf_exempt
+from django.utils.timezone import datetime
 
 # views.py
 from django.shortcuts import render
@@ -39,6 +40,7 @@ class ResumeAPIView(APIView):
 
 @csrf_exempt
 def serve_resume_page(request, resume_id):
+    # TODO: CONSULTAS Y ACCIONES POR REFACTORIZAR.
 
     if request.method == "POST":
         data = json.loads(request.body)
@@ -47,7 +49,32 @@ def serve_resume_page(request, resume_id):
         resume.email = data["email"]
         resume.summary = data["summary"]
         resume.save()
-        return Response(status=status.HTTP_200_OK)
+
+        # experiencias_actuales = resume.experiences.all()
+
+        experiences_ids = []
+        for orden, experiencia_data in enumerate(data["experiences"]):
+
+            if experiencia_data.get("id"):
+                experiencia = Experience.objects.get(pk=experiencia_data["id"])
+                experiencia.name = experiencia_data["name"]
+                experiencia.url = experiencia_data["url"]
+                experiencia.summary = experiencia_data["summary"]
+                experiencia.save()
+                experiences_ids.append(experiencia.id)
+                continue
+
+            experiencia = Experience.objects.create(
+                **experiencia_data,
+                resume=resume,
+                orden=orden,
+                start_date=datetime.now(),
+                end_date=datetime.now()
+            )
+            experiences_ids.append(experiencia.id)
+
+        resume.experiences.exclude(id__in=experiences_ids).delete()
+        return Response({}, status=status.HTTP_200_OK)
 
     resume = Resume.objects.get(pk=resume_id)
     resume_data = ResumeSerializer(resume, context={"request": request}).data

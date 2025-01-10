@@ -36,6 +36,16 @@ class Experience(models.Model):
     resume = models.ForeignKey(
         Resume, on_delete=models.CASCADE, related_name="experiences"
     )
+    orden = models.PositiveIntegerField()
+
+    class Meta:
+        ordering = ["orden"]
+        constraints = [
+            # Garantiza que dos experiencias asociadas al mismo Resume no tengan el mismo orden.
+            models.UniqueConstraint(
+                fields=["resume", "orden"], name="unique_order_per_resume"
+            )
+        ]
 
     def __str__(self):
         return f"[Experience] {self.name}"

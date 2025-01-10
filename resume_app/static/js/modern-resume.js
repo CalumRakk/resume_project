@@ -110,14 +110,14 @@ template.innerHTML = `
         <p><span id="summary" class="editable">Resumen no disponible</span></p>
     </section>
     <section>
-        <h2>Habilidades</h2>
-        <ul class="skills" id="skills"></ul>
-        <button class="add-btn" data-action="add-skill">+ Añadir habilidad</button>
-    </section>
-    <section>
         <h2>Experiencia</h2>
         <ul class="experiences" id="experiences"></ul>
         <button class="add-btn" data-action="add-experience">+ Añadir experiencia</button>
+    </section>
+    <section>
+        <h2>Habilidades</h2>
+        <ul class="skills" id="skills"></ul>
+        <button class="add-btn" data-action="add-skill">+ Añadir habilidad</button>
     </section>
 `;
 
@@ -156,6 +156,7 @@ class ModernResume extends HTMLElement {
 
       if (target.classList.contains('delete-btn')) {
         const section_name =  target.closest('ul').id;
+        // FIXME: target.getAttribute("data-id") devolverá 0 si no encuentra el atributo
         const index= +target.getAttribute("data-id")
         this.deleteItem(section_name, index);
       }
@@ -244,7 +245,7 @@ class ModernResume extends HTMLElement {
       skillsList.innerHTML = resume.skills.map((skill, index) => `
         <li>
           <span section_name="skills" class="editable" data-id="${index}">${skill}</span>
-          <span class="delete-btn">×</span>
+          <span class="delete-btn" data-id="${index}">×</span>
         </li>
       `).join('');
     }
