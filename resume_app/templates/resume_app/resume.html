@@ -21,12 +21,14 @@
 </head>
 <body>
     <div id="app"></div>
+    <button id="save-btn">Guardar cambios</button>
     <script src="{% static 'js/modern-resume.js' %}"></script>
     <!-- <script src="{% static 'js/fetch-data.js' %}"></script> -->
     <script>
         function loader() {
             const dataElement = document.getElementById("__DATA__");
             const appContainer = document.getElementById("app");
+            const saveButton = document.getElementById("save-btn");
 
             if (!dataElement || !appContainer) {
                 console.error("El contenedor de datos o la aplicación no están definidos.");
@@ -50,6 +52,13 @@
                 if (typeof component.render === 'function') {
                     component.render(); // Llamar a render si existe
                 }
+
+                saveButton.addEventListener('click', async () => {
+                    const resume = component.state;
+                    console.log(resume);
+                    await component.sendDataToBackend();
+                    
+                });
             } catch (error) {
                 console.error("Error al procesar los datos:", error);
             }

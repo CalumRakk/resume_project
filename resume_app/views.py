@@ -13,6 +13,7 @@ from .serializers import (
     ExperienceSerializer,
     ResumeCustomizationSerializer,
 )
+from django.views.decorators.csrf import csrf_exempt
 
 # views.py
 from django.shortcuts import render
@@ -36,7 +37,18 @@ class ResumeAPIView(APIView):
         return Response(data)
 
 
+@csrf_exempt
 def serve_resume_page(request, resume_id):
+
+    if request.method == "POST":
+        data = json.loads(request.body)
+        resume = Resume.objects.get(pk=resume_id)
+        resume.full_name = data["full_name"]
+        resume.email = data["email"]
+        resume.summary = data["summary"]
+        resume.save()
+        return Response(status=status.HTTP_200_OK)
+
     resume = Resume.objects.get(pk=resume_id)
     resume_serializer = ResumeSerializer(resume, context={"request": request})
     resume_data = resume_serializer.data

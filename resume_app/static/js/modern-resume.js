@@ -257,27 +257,27 @@ class ModernResume extends HTMLElement {
         </li>
       `).join('');
     }
+  }
 
+  async sendDataToBackend() {
+    try {
+      const response = await fetch(window.location.href, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(this.state),
+      });
 
-    // this.shadowRoot.querySelector("#full-name").textContent = resume.full_name;
-    // this.shadowRoot.querySelector("#email").textContent = resume.email;
-    // this.shadowRoot.querySelector("#summary").textContent = resume.summary;
+      if (!response.ok) {
+        throw new Error('Error al enviar los datos');
+      }
 
-    // const skillsList = this.shadowRoot.querySelector("#skills");
-    // skillsList.innerHTML = resume.skills.map(skill => `
-    //   <li>
-    //     <span class="editable">${skill}</span>
-    //     <span class="delete-btn">×</span>
-    //   </li>
-    // `).join('');
-
-    // const experiencesList = this.shadowRoot.querySelector("#experiences");
-    // experiencesList.innerHTML = resume.experiences.map(exp => `
-    //   <li>
-    //     <span class="editable">${exp}</span>
-    //     <span class="delete-btn">×</span>
-    //   </li>
-    // `).join('');
+      const result = await response.json();
+      console.log('Datos enviados correctamente:', result);
+    } catch (error) {
+      console.error('Error al enviar los datos:', error);
+    }
   }
 }
 
