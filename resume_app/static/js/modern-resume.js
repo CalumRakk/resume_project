@@ -155,9 +155,9 @@ class ModernResume extends HTMLElement {
       }
 
       if (target.classList.contains('delete-btn')) {
-        const list = target.closest('ul').id;
-        const index = Array.from(target.parentNode.parentNode.children).indexOf(target.parentNode);
-        this.deleteItem(list, index);
+        const section_name =  target.closest('ul').id;
+        const index= +target.getAttribute("data-id")
+        this.deleteItem(section_name, index);
       }
 
       if (target.classList.contains('add-btn')) {
@@ -165,7 +165,7 @@ class ModernResume extends HTMLElement {
         if (action === 'add-skill') {
           this.addItem('skills', 'Nueva habilidad');
         } else if (action === 'add-experience') {
-          this.addItem('experiences', 'Nueva experiencia');
+          this.addItem('experiences', {name: 'Nueva experiencia', url: 'https://www.example.com', summary: "Resumen de la experiencia"});
         }
       }
     });
@@ -211,17 +211,14 @@ class ModernResume extends HTMLElement {
 
   addItem(section_name, defaultValue) {
     const currentItems = this.state[section_name];
+
     const data= [...currentItems, defaultValue]
     this.state[section_name]= data;
-  }
-
-  addExperience() {
-    
   }
   deleteItem(section_name, index) {
     const currentItems = this.state[section_name];
     const data= [...currentItems]
-    data.pop(index);
+    data.splice(index, 1);
     this.state[section_name]= data;
   }
 
@@ -260,7 +257,7 @@ class ModernResume extends HTMLElement {
             <h2 section_name="experiences" data-id="${index}" data-key="name" class="editable">${exp.name}</h2>
             <a section_name="experiences" data-id="${index}" data-key="url" class="editable">${exp.url}</a>
             <p section_name="experiences" data-id="${index}" data-key="summary" class="editable">${exp.summary}</p>         
-            <span class="delete-btn">×</span>
+            <span class="delete-btn" data-id="${index}">×</span>
           </article>
         </li>
       `).join('');
