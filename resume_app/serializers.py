@@ -16,6 +16,8 @@ class SkillSerializer(serializers.ModelSerializer):
 
 
 class ExperienceSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False)
+
     class Meta:
         model = Experience
         fields = [
@@ -69,6 +71,10 @@ class ResumeSerializer(serializers.ModelSerializer):
             setattr(instance, key, value)
         instance.save()
 
+        # Obtener los IDs de los skills que están en el JSON
+        # Eliminar los skills que no están en el JSON
+        skill_ids_in_data = [i["id"] for i in skills_data if i.get("id")]
+        instance.skills.exclude(id__in=skill_ids_in_data).delete()
         for skill_data in skills_data:
             skill_id = skill_data.get("id")
             if skill_id:
@@ -79,10 +85,16 @@ class ResumeSerializer(serializers.ModelSerializer):
             else:
                 Skill.objects.create(resume=instance, **skill_data)
 
+        experience_ids_in_data = [i["id"] for i in experiences_data if i.get("id")]
+        instance.experiences.exclude(id__in=experience_ids_in_data).delete()
         for experience_data in experiences_data:
-            experience = instance.experiences.get(id=experience_data.get("id"))
-            for key, value in experience_data.items():
-                setattr(experience, key, value)
-            experience.save()
+            experience_id = experience_data.get("id")
+            if experience_id:
+                experience = instance.experiences.get(id=experience_id)
+                for key, value in experience_data.items():
+                    setattr(experience, key, value)
+                experience.save()
+            else:
+                Experience.objects.create(resume=instance, **experience_data)
 
         return instance
