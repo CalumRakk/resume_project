@@ -45,7 +45,7 @@ class Experience(models.Model):
     resume = models.ForeignKey(
         Resume, on_delete=models.CASCADE, related_name="experiences"
     )
-    orden = models.PositiveIntegerField(default=0)
+    orden = models.PositiveIntegerField()
 
     class Meta:
         ordering = ["orden"]

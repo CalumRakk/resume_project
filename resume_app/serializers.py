@@ -39,18 +39,37 @@ class ExperienceSerializer(serializers.ModelSerializer):
 
 
 class TemplateSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False)
+
     class Meta:
         model = Template
-        fields = "__all__"
+        fields = ["id", "name", "descripcion", "componet_name", "customazation_rules"]
+
+    def validate(self, attrs):
+        return super().validate(attrs)
 
 
 class ResumeSerializer(serializers.ModelSerializer):
     skills = SkillSerializer(many=True, required=False)
     experiences = ExperienceSerializer(many=True, required=False)
+    template_selected = serializers.PrimaryKeyRelatedField(
+        queryset=Template.objects.all(), required=False, write_only=True
+    )
 
     class Meta:
         model = Resume
         fields = "__all__"
+
+    def to_representation(self, instance):
+        """
+        Sobrescribe la representación para incluir el template_selected como un objeto JSON.
+        """
+        representation = super().to_representation(instance)
+        if instance.template_selected:
+            representation["template_selected"] = TemplateSerializer(
+                instance.template_selected
+            ).data
+        return representation
 
     def create(self, validated_data):
         skills_data = validated_data.pop("skills", [])
