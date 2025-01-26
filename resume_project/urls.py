@@ -17,13 +17,13 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path
-from resume_app.views import ResumeDetailDestroyView, ResumeListCreateView
+from resume_app.views import ResumeDetailUpdateDestroyView, ResumeListCreateView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path(
         "api/resumes/<int:id>/",
-        ResumeDetailDestroyView.as_view(),
+        ResumeDetailUpdateDestroyView.as_view(),
         name="resume-detail-destroy",
     ),
     path("api/resumes/", ResumeListCreateView.as_view(), name="resume-list-create"),

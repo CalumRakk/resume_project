@@ -3,7 +3,7 @@ from .models import Resume
 from .serializers import ResumeSerializer
 
 
-class ResumeDetailDestroyView(generics.RetrieveDestroyAPIView):
+class ResumeDetailUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Resume.objects.all()
     serializer_class = ResumeSerializer
     lookup_field = "id"
