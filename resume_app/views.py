@@ -9,6 +9,6 @@ class ResumeDetailView(generics.RetrieveAPIView):
     lookup_field = "id"
 
 
-class ResumeListView(generics.ListAPIView):
+class ResumeListCreateView(generics.ListCreateAPIView):
     queryset = Resume.objects.all()
     serializer_class = ResumeSerializer

@@ -17,10 +17,10 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path
-from resume_app.views import ResumeDetailView, ResumeListView
+from resume_app.views import ResumeDetailView, ResumeListCreateView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/resumes/<int:id>/", ResumeDetailView.as_view(), name="resume-detail"),
-    path("api/resumes/", ResumeListView.as_view(), name="resume-list"),
+    path("api/resumes/", ResumeListCreateView.as_view(), name="resume-list-create"),
 ]
