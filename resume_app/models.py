@@ -1,7 +1,18 @@
 from django.db import models
 
 
-class Resume(models.Model):
+class BaseModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return f"[{self.__class__.__name__}] {self.id}"
+
+
+class Resume(BaseModel):
     full_name = models.CharField(max_length=100)
     email = models.EmailField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -11,19 +22,13 @@ class Resume(models.Model):
         "Template", on_delete=models.CASCADE, related_name="resumes", null=True
     )
 
-    def __str__(self):
-        return f"[Resume] {self.full_name}"
 
-
-class Skill(models.Model):
+class Skill(BaseModel):
     name = models.CharField(max_length=100, default="Web Development")
     resume = models.ForeignKey(Resume, on_delete=models.CASCADE, related_name="skills")
     level = models.CharField(default="Master", max_length=100)
     keywords = models.JSONField(default=list)
     orden = models.PositiveIntegerField()
-
-    def __str__(self):
-        return self.name
 
     class Meta:
         ordering = ["orden"]
@@ -34,7 +39,7 @@ class Skill(models.Model):
         ]
 
 
-class Experience(models.Model):
+class Experience(BaseModel):
     name = models.CharField(max_length=100, default="Company Name")
     position = models.CharField(max_length=100, default="President")
     url = models.URLField(default="https://company.com")
@@ -56,27 +61,21 @@ class Experience(models.Model):
             )
         ]
 
-    def __str__(self):
-        return f"[Experience] {self.name}"
 
-
-class Template(models.Model):
+class Template(BaseModel):
     name = models.CharField(max_length=100)
     descripcion = models.TextField()
     componet_name = models.CharField(max_length=100)
     customazation_rules = models.JSONField(default=list)
 
-    def __str__(self):
-        return f"[Template] {self.name}"
 
-
-class ResumeTemplate(models.Model):
+class ResumeTemplate(BaseModel):
     resume = models.ForeignKey(Resume, on_delete=models.CASCADE)
     template = models.ForeignKey(Template, on_delete=models.CASCADE)
     custom_styles = models.JSONField(default=list)
 
 
-class ResumeCustomization(models.Model):
+class ResumeCustomization(BaseModel):
     resume = models.ForeignKey(Resume, on_delete=models.CASCADE)
     template = models.ForeignKey(Template, on_delete=models.CASCADE)
     custom_styles = models.JSONField(default=list)
