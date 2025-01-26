@@ -7,7 +7,7 @@ class SkillSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Skill
-        fields = ["id", "name", "level", "keywords"]
+        fields = ["id", "name", "level", "keywords", "orden"]
 
     def validate(self, data):
         if "resume" not in data:

@@ -20,9 +20,18 @@ class Skill(models.Model):
     resume = models.ForeignKey(Resume, on_delete=models.CASCADE, related_name="skills")
     level = models.CharField(default="Master", max_length=100)
     keywords = models.JSONField(default=list)
+    orden = models.PositiveIntegerField()
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        ordering = ["orden"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["resume", "orden"], name="unique_order_per_resume_skill"
+            )
+        ]
 
 
 class Experience(models.Model):
@@ -36,14 +45,14 @@ class Experience(models.Model):
     resume = models.ForeignKey(
         Resume, on_delete=models.CASCADE, related_name="experiences"
     )
-    orden = models.PositiveIntegerField()
+    orden = models.PositiveIntegerField(default=0)
 
     class Meta:
         ordering = ["orden"]
         constraints = [
             # Garantiza que dos experiencias asociadas al mismo Resume no tengan el mismo orden.
             models.UniqueConstraint(
-                fields=["resume", "orden"], name="unique_order_per_resume"
+                fields=["resume", "orden"], name="unique_order_per_resume_experience"
             )
         ]
 
