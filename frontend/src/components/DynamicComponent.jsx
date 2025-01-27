@@ -1,19 +1,20 @@
-import React, { Suspense, lazy } from "react";
+import React from "react";
 
-const DynamicComponent = ({ componentName, resume  }) => {
-  const Component = React.useMemo(() => {
-    try {
-      return lazy(() => import(`./${componentName}`));
-    } catch (error) {
-      console.error("Error al cargar el componente:", error);
-      return null;
-    }
-  }, [componentName]);
+const DynamicComponent = ({ componentName, resume, setResume, setDynamicComponentName }) => {
+  const handleChangeComponent = () => {
+    setDynamicComponentName("ClassicResume");
+  };
+
+  const ComponentToRender = React.lazy(() => import(`./${componentName}`));
 
   return (
-    <Suspense fallback={<div>Cargando componente...</div>}>
-      {Component ? <Component resume={resume} /> : <div>No se pudo cargar el componente.</div>}
-    </Suspense>
+    <div>
+      <React.Suspense fallback={<div>Cargando componente...</div>}>
+        <ComponentToRender resume={resume} setResume={setResume} />
+      </React.Suspense>
+
+      <button onClick={handleChangeComponent}>Cambiar Componente</button>
+    </div>
   );
 };
 

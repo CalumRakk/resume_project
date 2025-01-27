@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import styles from "./ResumeDetail.module.css";
 import DynamicComponent  from "./DynamicComponent";
 const apiUrl = process.env.REACT_APP_API_URL;
 
@@ -9,6 +8,7 @@ function ResumeDetail() {
   const [resume, setResume] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [dynamicComponentName, setDynamicComponentName] = useState(null);
 
   useEffect(() => {
     fetch(`${apiUrl}/v1/resumes/${id}/`)
@@ -20,6 +20,7 @@ function ResumeDetail() {
       })
       .then((data) => {
         setResume(data);
+        setDynamicComponentName(data.template_selected.componet_name);
         setLoading(false);
       })
       .catch((error) => {
@@ -33,8 +34,13 @@ function ResumeDetail() {
   if (!resume) return <p>Resume no encontrado</p>;
 
   return (
-    <div className={styles.container}>      
-      <DynamicComponent componentName="ModernResume" resume={ resume } />
+    <div>      
+      <DynamicComponent
+        componentName={dynamicComponentName}
+        resume={resume}
+        setResume={setResume}
+        setDynamicComponentName={setDynamicComponentName}
+      />
     </div>
   );
 }

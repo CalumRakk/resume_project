@@ -1,37 +1,11 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React from "react";
 import styles from "./ModernResume.module.css";
 
-const ModernResume = ({  resume, setResume }) => {
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
-
-  const handleUpdate = async () => {
-    try {
-      setLoading(true);
-      setMessage("");
-
-      const copyResume= {...resume, template_selected: resume.template_selected.id};
-      const response = await axios.put(
-        "http://127.0.0.1:8000/v1/resumes/1/",
-        copyResume
-      );
-
-      setMessage("Datos actualizados con éxito.");
-      console.log("Respuesta de la API:", response.data);
-
-    } catch (error) {
-      console.error("Error al actualizar los datos:", error);
-      setMessage("Ocurrió un error al actualizar los datos.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
+function ClassicResume( {  resume, setResume }) {
+return (
     <div className={styles.container}>
       <div className={styles.resume}>
-        <header className={styles.header}>
+        <header style={{color: "red"}}>
           <h1>{resume.full_name}</h1>
           <p>{resume.email}</p>
         </header>
@@ -68,4 +42,4 @@ const ModernResume = ({  resume, setResume }) => {
   );
 };
 
-export default ModernResume;
+export default ClassicResume;
