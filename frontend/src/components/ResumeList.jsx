@@ -8,7 +8,7 @@ function ResumeList() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch(`${apiUrl}/api/resumes/`)
+    fetch(`${apiUrl}/v1/resumes/`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");

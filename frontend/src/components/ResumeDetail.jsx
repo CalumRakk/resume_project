@@ -9,7 +9,7 @@ function ResumeDetail() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch(`${apiUrl}/api/resumes/${id}/`)
+    fetch(`${apiUrl}/v1/resumes/${id}/`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("La respuesta no fue exitosa");

@@ -22,9 +22,9 @@ from resume_app.views import ResumeDetailUpdateDestroyView, ResumeListCreateView
 urlpatterns = [
     path("admin/", admin.site.urls),
     path(
-        "api/resumes/<int:id>/",
+        "v1/resumes/<int:id>/",
         ResumeDetailUpdateDestroyView.as_view(),
         name="resume-detail-destroy",
     ),
-    path("api/resumes/", ResumeListCreateView.as_view(), name="resume-list-create"),
+    path("v1/resumes/", ResumeListCreateView.as_view(), name="resume-list-create"),
 ]
