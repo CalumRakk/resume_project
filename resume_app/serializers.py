@@ -97,10 +97,13 @@ class ResumeSerializer(serializers.ModelSerializer):
         for skill_data in skills_data:
             skill_id = skill_data.get("id")
             if skill_id:
-                skill = instance.skills.get(id=skill_id)
-                for key, value in skill_data.items():
-                    setattr(skill, key, value)
-                skill.save()
+                try:
+                    skill = instance.skills.get(id=skill_id)
+                    for key, value in skill_data.items():
+                        setattr(skill, key, value)
+                    skill.save()
+                except Skill.DoesNotExist:
+                    Skill.objects.create(resume=instance, **skill_data)
             else:
                 Skill.objects.create(resume=instance, **skill_data)
 
@@ -109,10 +112,13 @@ class ResumeSerializer(serializers.ModelSerializer):
         for experience_data in experiences_data:
             experience_id = experience_data.get("id")
             if experience_id:
-                experience = instance.experiences.get(id=experience_id)
-                for key, value in experience_data.items():
-                    setattr(experience, key, value)
-                experience.save()
+                try:
+                    experience = instance.experiences.get(id=experience_id)
+                    for key, value in experience_data.items():
+                        setattr(experience, key, value)
+                    experience.save()
+                except Experience.DoesNotExist:
+                    Experience.objects.create(resume=instance, **experience_data)
             else:
                 Experience.objects.create(resume=instance, **experience_data)
 

@@ -17,7 +17,11 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path
-from resume_app.views import ResumeDetailUpdateDestroyView, ResumeListCreateView
+from resume_app.views import (
+    ResumeDetailUpdateDestroyView,
+    ResumeListCreateView,
+    TemplateListResumeTemplateUpdateView,
+)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -27,4 +31,9 @@ urlpatterns = [
         name="resume-detail-destroy",
     ),
     path("v1/resumes/", ResumeListCreateView.as_view(), name="resume-list-create"),
+    path(
+        "v1/templates/",
+        TemplateListResumeTemplateUpdateView.as_view(),
+        name="template-list-resume-template-update",
+    ),
 ]
