@@ -4,14 +4,14 @@ import DynamicComponent  from "./DynamicComponent";
 const apiUrl = process.env.REACT_APP_API_URL;
 
 function ResumeDetail() {
-  const { id } = useParams();
+  const { resumeId } = useParams();
   const [resume, setResume] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [dynamicComponentName, setDynamicComponentName] = useState(null);
 
   useEffect(() => {
-    fetch(`${apiUrl}/v1/resumes/${id}/`)
+    fetch(`${apiUrl}/v1/resumes/${resumeId}/`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("La respuesta no fue exitosa");
@@ -27,20 +27,22 @@ function ResumeDetail() {
         setError(error.message);
         setLoading(false);
       });
-  }, [id]);
+  }, [resumeId]);
 
   if (loading) return <p>Cargando...</p>;
   if (error) return <p>Error: {error}</p>;
   if (!resume) return <p>Resume no encontrado</p>;
 
   return (
-    <div>      
+    <div>   
+      <a href={`/resumes/${resumeId}/template`}>Cambiar Componente</a>
+
       <DynamicComponent
         componentName={dynamicComponentName}
         resume={resume}
         setResume={setResume}
         setDynamicComponentName={setDynamicComponentName}
-      />
+      />      
     </div>
   );
 }
