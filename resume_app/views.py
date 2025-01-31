@@ -24,14 +24,23 @@ class TemplateListResumeTemplateUpdateView(APIView):
 
     def put(self, request, *args, **kwargs):
         try:
-            resume = Resume.objects.get(id=request.data.pop("resume_id"))
+            resume_id = request.data.pop("resume_id")
+            template_selected = request.data.pop("template_selected")
+            if resume_id and template_selected:
+                resume = Resume.objects.get(id=resume_id)
+                template = Template.objects.get(id=template_selected)
+                resume.template_selected = template
+                resume.save()
+                return Response(
+                    {"success": "Resume updated successfully"},
+                    status=status.HTTP_200_OK,
+                )
+            else:
+                return Response(
+                    {"error": "resume_id and template_selected are required"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
         except Resume.DoesNotExist:
             return Response(
                 {"error": "Resume not found"}, status=status.HTTP_404_NOT_FOUND
             )
-
-        serializer = ResumeSerializer(resume, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
