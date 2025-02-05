@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 
 class BaseModel(models.Model):
@@ -20,6 +21,9 @@ class Resume(BaseModel):
     summary = models.TextField()
     template_selected = models.ForeignKey(
         "Template", on_delete=models.CASCADE, related_name="resumes", null=True
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="resumes"
     )
 
 

@@ -3,20 +3,31 @@ from .models import Resume, Template
 from .serializers import ResumeSerializer, TemplateSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 
 
 class ResumeDetailUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Resume.objects.all()
     serializer_class = ResumeSerializer
     lookup_field = "id"
 
+    def get_queryset(self):
+        return Resume.objects.filter(user=self.request.user)
+
 
 class ResumeListCreateView(generics.ListCreateAPIView):
-    queryset = Resume.objects.all()
     serializer_class = ResumeSerializer
+
+    def get_queryset(self):
+        # Solo retorna los currículos del usuario autenticado
+        return Resume.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        # Asigna automáticamente el usuario autenticado al crear un resume
+        serializer.save(user=self.request.user)
 
 
 class TemplateListResumeTemplateUpdateView(APIView):
+
     def get(self, request, *args, **kwargs):
         templates = Template.objects.all()
         serializer = TemplateSerializer(templates, many=True)
@@ -27,7 +38,8 @@ class TemplateListResumeTemplateUpdateView(APIView):
             resume_id = request.data.pop("resume_id")
             template_selected = request.data.pop("template_selected")
             if resume_id and template_selected:
-                resume = Resume.objects.get(id=resume_id)
+                # Verifica que el resume pertenece al usuario autenticado
+                resume = Resume.objects.get(id=resume_id, user=request.user)
                 template = Template.objects.get(id=template_selected)
                 resume.template_selected = template
                 resume.save()
