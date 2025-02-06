@@ -1,0 +1,9 @@
+###
+POST {{host}}/{{version}}/login/
+Content-Type: application/json
+User-Agent: {{userAgent}}
+
+{
+    "username": "admin",
+    "password": "admin"
+}

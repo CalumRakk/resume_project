@@ -37,7 +37,7 @@ class TemplateListResumeTemplateUpdateView(APIView):
         serializer = TemplateSerializer(templates, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def put(self, request, *args, **kwargs):
+    def patch(self, request, *args, **kwargs):
         try:
             resume_id = request.data.pop("resume_id")
             template_selected = request.data.pop("template_selected")
@@ -70,14 +70,10 @@ class CustomTokenRefreshView(TokenRefreshView):
             if not refresh_token:
                 raise TokenError("Refresh token no proporcionado")
 
-            # Decodificar el refresh token
             token = RefreshToken(refresh_token)
-
-            # Validar los metadatos almacenados en el token
             user_metadata = token.payload.get("user_metadata", {})
             stored_ip = user_metadata.get("ip_address")
             stored_user_agent = user_metadata.get("user_agent")
-
             current_ip = self._get_client_ip(request)
             current_user_agent = request.META.get("HTTP_USER_AGENT", "")
 
@@ -87,7 +83,6 @@ class CustomTokenRefreshView(TokenRefreshView):
                 token.blacklist()
                 raise TokenError("Token no válido: posible acceso no autorizado")
 
-            # Generar un nuevo token de acceso
             access_token = str(token.access_token)
             return Response({"access": access_token}, status=status.HTTP_200_OK)
 

@@ -55,6 +55,7 @@ class ResumeSerializer(serializers.ModelSerializer):
     template_selected = serializers.PrimaryKeyRelatedField(
         queryset=Template.objects.all(), required=False, write_only=True
     )
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Resume
@@ -72,6 +73,9 @@ class ResumeSerializer(serializers.ModelSerializer):
         return representation
 
     def create(self, validated_data):
+        user = self.context["request"].user
+        validated_data["user"] = user
+
         skills_data = validated_data.pop("skills", [])
         experiences_data = validated_data.pop("experiences", [])
         resume = Resume.objects.create(**validated_data)
@@ -83,6 +87,9 @@ class ResumeSerializer(serializers.ModelSerializer):
         return resume
 
     def update(self, instance, validated_data):
+        user = self.context["request"].user
+        validated_data["user"] = user
+
         skills_data = validated_data.pop("skills", [])
         experiences_data = validated_data.pop("experiences", [])
 

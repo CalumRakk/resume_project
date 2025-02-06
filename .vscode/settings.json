@@ -1,0 +1,18 @@
+{
+    "rest-client.environmentVariables": {
+      "$shared": {
+        "version":"v1",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 Edg/132.0.0.0"
+      },
+      "local": {
+        "host": "http://127.0.0.1:8000",
+
+        "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc0MTQ0NjI3NywiaWF0IjoxNzM4ODU0Mjc3LCJqdGkiOiJhYTNiZjE5ZjIyMWQ0NDM2ODE0M2E2MTZmYTFhYzYzNSIsInVzZXJfaWQiOjEsInVzZXJfbWV0YWRhdGEiOnsiaXBfYWRkcmVzcyI6IjEyNy4wLjAuMSIsInVzZXJfYWdlbnQiOiJNb3ppbGxhLzUuMCAoV2luZG93cyBOVCAxMC4wOyBXaW42NDsgeDY0KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBDaHJvbWUvMTMyLjAuMC4wIFNhZmFyaS81MzcuMzYgRWRnLzEzMi4wLjAuMCJ9fQ.fRaDfeLWKiU4iEvpiPU-5OfK28e_E2GXRh6wrlRIZP8"
+      },
+      "production": {
+        "host": "https://example.com",
+        "accessToken": "Bearer my-production-token"
+      }
+    }
+}
+  

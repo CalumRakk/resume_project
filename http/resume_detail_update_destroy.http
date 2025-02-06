@@ -1,0 +1,79 @@
+# refresca la autenticación.
+# @name login
+POST {{host}}/{{version}}/refresh-token/
+Content-Type: application/json
+User-Agent: {{userAgent}}
+
+{
+    "refresh":"{{refreshToken}}"
+}
+
+
+### VER DETALLES DE UN RESUME
+
+GET {{host}}/{{version}}/resumes/1
+Content-Type: application/json
+User-Agent: {{userAgent}}
+Authorization: Bearer {{login.response.body.access}}
+
+
+### ACTUALIZA/SOBREESCRIBE UN RESUME CON NUEVOS DATOS
+# Esta petición reemplaza todo el resume,por lo que es necesario enviar todo el objeto.
+PUT {{host}}/{{version}}/resumes/1/
+Content-Type: application/json
+User-Agent: {{userAgent}}
+Authorization: Bearer {{login.response.body.access}}
+
+{
+  "id": 1,
+  "skills": [
+    {
+      "id": 6,
+      "name": "Web Development",
+      "level": "Master",
+      "keywords": [
+        "HTML",
+        "CSS",
+        "JavaScript"
+      ],
+      "orden": 0
+    },
+    {
+      "id": 1,
+      "name": "Web Development 3",
+      "level": "Master",
+      "keywords": [
+        "HTML",
+        "CSS",
+        "JavaScript"
+      ],
+      "orden": 1
+    }
+  ],
+  "experiences": [
+    {
+      "id": 12,
+      "name": "Desarrollador Web, Malambo Atlántico",
+      "position": "President",
+      "url": "https://company.com",
+      "highlights": [],
+      "summary": "Fui parte del Desarrollo de la web usando Djando del lado del backend y para la interactividad de la web usando JavaScript con JQuery.",
+      "start_date": "2025-01-10",
+      "end_date": "2025-01-10",
+      "orden": 1
+    }
+  ],
+  "full_name": "Leonardo {{$guid}}",
+  "email": "leocasti@gmail.com",
+  "created_at": "2024-12-11T17:27:20.679337Z",
+  "updated_at": "2025-01-31T17:53:57.514065Z",
+  "summary": "Soy un apasionado del desarrollo web y actualmente estoy estudiando un curso de desarrollador web en Alura Latam. Formé parte del desarrollo de una aplicación web usando Django para",
+  "template_selected": 2
+}
+
+###
+
+DELETE  {{host}}/{{version}}/resumes/21/
+Content-Type: application/json
+User-Agent: {{userAgent}}
+Authorization: Bearer {{login.response.body.access}}

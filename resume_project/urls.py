@@ -38,7 +38,7 @@ urlpatterns = [
         TemplateListResumeTemplateUpdateView.as_view(),
         name="template-list-resume-template-update",
     ),
-    path("login/", TokenObtainPairView.as_view(), name="login"),
-    path("refresh-token/", CustomTokenRefreshView.as_view(), name="refresh_token"),
+    path("v1/login/", TokenObtainPairView.as_view(), name="login"),
+    path("v1/refresh-token/", CustomTokenRefreshView.as_view(), name="refresh_token"),
     # path("logout/", LogoutView.as_view(), name="logout"),
 ]
