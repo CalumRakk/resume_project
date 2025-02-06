@@ -5,7 +5,9 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 from drf_spectacular.utils import extend_schema, OpenApiExample
+from django.shortcuts import get_object_or_404
 
+from .utils import get_client_ip
 from .middleware import is_ip_in_range
 from .models import Resume, Template
 from .serializers import ResumeSerializer, TemplateSerializer
@@ -107,28 +109,24 @@ class TemplateListResumeTemplateUpdateView(APIView):
         ],
     )
     def patch(self, request, *args, **kwargs):
-        try:
-            resume_id = request.data.pop("resume_id")
-            template_selected = request.data.pop("template_selected")
-            if resume_id and template_selected:
-                # Verifica que el resume pertenece al usuario.
-                resume = Resume.objects.get(id=resume_id, user=request.user)
-                template = Template.objects.get(id=template_selected)
-                resume.template_selected = template
-                resume.save()
-                return Response(
-                    {"success": "Resume updated successfully"},
-                    status=status.HTTP_200_OK,
-                )
-            else:
-                return Response(
-                    {"error": "resume_id and template_selected are required"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-        except Resume.DoesNotExist:
+        resume_id = request.data.get("resume_id")
+        template_selected = request.data.get("template_selected")
+
+        if not resume_id or not template_selected:
             return Response(
-                {"error": "Resume not found"}, status=status.HTTP_404_NOT_FOUND
+                {"error": "resume_id y template_selected son requeridos"},
+                status=status.HTTP_400_BAD_REQUEST,
             )
+
+        resume = get_object_or_404(Resume, id=resume_id, user=request.user)
+        template = get_object_or_404(Template, id=template_selected)
+
+        resume.template_selected = template
+        resume.save()
+        return Response(
+            {"success": "Resume updated successfully"},
+            status=status.HTTP_200_OK,
+        )
 
 
 class CustomTokenRefreshView(TokenRefreshView):
@@ -143,7 +141,7 @@ class CustomTokenRefreshView(TokenRefreshView):
             user_metadata = token.payload.get("user_metadata", {})
             stored_ip = user_metadata.get("ip_address")
             stored_user_agent = user_metadata.get("user_agent")
-            current_ip = self._get_client_ip(request)
+            current_ip = get_client_ip(request)
             current_user_agent = request.META.get("HTTP_USER_AGENT", "")
 
             if stored_user_agent != current_user_agent or not is_ip_in_range(
@@ -157,11 +155,3 @@ class CustomTokenRefreshView(TokenRefreshView):
 
         except TokenError as e:
             return Response({"error": str(e)}, status=status.HTTP_401_UNAUTHORIZED)
-
-    def _get_client_ip(self, request):
-        x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
-        if x_forwarded_for:
-            ip = x_forwarded_for.split(",")[0]
-        else:
-            ip = request.META.get("REMOTE_ADDR")
-        return ip
