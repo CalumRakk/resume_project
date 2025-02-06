@@ -1,9 +1,13 @@
 from rest_framework import generics, status
-from .models import Resume, Template
-from .serializers import ResumeSerializer, TemplateSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework_simplejwt.tokens import RefreshToken
+from .middleware import is_ip_in_range
+
+from .models import Resume, Template
+from .serializers import ResumeSerializer, TemplateSerializer
 
 
 class ResumeDetailUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
@@ -56,3 +60,44 @@ class TemplateListResumeTemplateUpdateView(APIView):
             return Response(
                 {"error": "Resume not found"}, status=status.HTTP_404_NOT_FOUND
             )
+
+
+class CustomTokenRefreshView(TokenRefreshView):
+    def post(self, request, *args, **kwargs):
+        try:
+            # Obtener el refresh token de la solicitud
+            refresh_token = request.data.get("refresh")
+            if not refresh_token:
+                raise TokenError("Refresh token no proporcionado")
+
+            # Decodificar el refresh token
+            token = RefreshToken(refresh_token)
+
+            # Validar los metadatos almacenados en el token
+            user_metadata = token.payload.get("user_metadata", {})
+            stored_ip = user_metadata.get("ip_address")
+            stored_user_agent = user_metadata.get("user_agent")
+
+            current_ip = self._get_client_ip(request)
+            current_user_agent = request.META.get("HTTP_USER_AGENT", "")
+
+            if stored_user_agent != current_user_agent or not is_ip_in_range(
+                current_ip, stored_ip
+            ):
+                token.blacklist()
+                raise TokenError("Token no válido: posible acceso no autorizado")
+
+            # Generar un nuevo token de acceso
+            access_token = str(token.access_token)
+            return Response({"access": access_token}, status=status.HTTP_200_OK)
+
+        except TokenError as e:
+            return Response({"error": str(e)}, status=status.HTTP_401_UNAUTHORIZED)
+
+    def _get_client_ip(self, request):
+        x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(",")[0]
+        else:
+            ip = request.META.get("REMOTE_ADDR")
+        return ip

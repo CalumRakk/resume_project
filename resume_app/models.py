@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.contrib.auth.models import User
 
 
 class BaseModel(models.Model):
@@ -83,3 +84,15 @@ class ResumeCustomization(BaseModel):
     resume = models.ForeignKey(Resume, on_delete=models.CASCADE)
     template = models.ForeignKey(Template, on_delete=models.CASCADE)
     custom_styles = models.JSONField(default=list)
+
+
+class UserSession(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="session")
+    token = models.CharField(max_length=255, unique=True)
+    ip_address = models.GenericIPAddressField()
+    user_agent = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+
+    def __str__(self):
+        return f"Sesión de {self.user.username} desde {self.ip_address}"

@@ -17,10 +17,12 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path
+from rest_framework_simplejwt.views import TokenObtainPairView
 from resume_app.views import (
     ResumeDetailUpdateDestroyView,
     ResumeListCreateView,
     TemplateListResumeTemplateUpdateView,
+    CustomTokenRefreshView,
 )
 
 urlpatterns = [
@@ -36,4 +38,7 @@ urlpatterns = [
         TemplateListResumeTemplateUpdateView.as_view(),
         name="template-list-resume-template-update",
     ),
+    path("login/", TokenObtainPairView.as_view(), name="login"),
+    path("refresh-token/", CustomTokenRefreshView.as_view(), name="refresh_token"),
+    # path("logout/", LogoutView.as_view(), name="logout"),
 ]
