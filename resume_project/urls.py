@@ -25,6 +25,8 @@ from resume_app.views import (
     CustomTokenRefreshView,
 )
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+from django.conf import settings
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -32,12 +34,6 @@ urlpatterns = [
         "v1/",
         include(
             [
-                path("schema/", SpectacularAPIView.as_view(), name="schema"),
-                path(
-                    "swagger/",
-                    SpectacularSwaggerView.as_view(url_name="schema"),
-                    name="swagger-ui",
-                ),
                 path(
                     "resumes/<int:id>/",
                     ResumeDetailUpdateDestroyView.as_view(),
@@ -64,3 +60,20 @@ urlpatterns = [
         ),
     ),
 ]
+
+if settings.DEBUG:
+    urlpatterns += [
+        path(
+            "v1/",
+            include(
+                [
+                    path("schema/", SpectacularAPIView.as_view(), name="schema"),
+                    path(
+                        "swagger/",
+                        SpectacularSwaggerView.as_view(url_name="schema"),
+                        name="swagger-ui",
+                    ),
+                ]
+            ),
+        )
+    ]

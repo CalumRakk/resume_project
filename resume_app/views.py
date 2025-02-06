@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, OpenApiExample
 
 from .middleware import is_ip_in_range
 from .models import Resume, Template
@@ -15,9 +15,35 @@ from .serializers import ResumeSerializer, TemplateSerializer
 class ResumeDetailUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ResumeSerializer
     lookup_field = "id"
+    http_method_names = ["get", "post", "put", "delete"]
 
     def get_queryset(self):
         return Resume.objects.filter(user=self.request.user)
+
+    @extend_schema(
+        summary="Obtener un resume",
+        description="Retorna un resume del usuario..",
+        responses={200: ResumeSerializer},
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+    @extend_schema(
+        summary="Actualizacion de reemplazo de un resume",
+        description="Actualiza un Resumen completo en la base de datos. Reemplaza por completo los datos existentes con los nuevos datos proporcionados.",
+        request=ResumeSerializer,
+        responses={200: ResumeSerializer},
+    )
+    def put(self, request, *args, **kwargs):
+        return super().patch(request, *args, **kwargs)
+
+    @extend_schema(
+        summary="Eliminar el resumen",
+        description="Elimina el resumen especificado en la url.",
+        responses={204: None},
+    )
+    def delete(self, request, *args, **kwargs):
+        return super().delete(request, *args, **kwargs)
 
 
 @extend_schema(tags=["Resumes"])
@@ -25,16 +51,16 @@ class ResumeListCreateView(generics.ListCreateAPIView):
     serializer_class = ResumeSerializer
 
     def get_queryset(self):
-        # Solo retorna los currículos del usuario autenticado
+        # Solo retorna los currículos del usuario.
         return Resume.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        # Asigna automáticamente el usuario autenticado al crear un resume
+        # Asigna automáticamente el usuario. al crear un resume
         serializer.save(user=self.request.user)
 
     @extend_schema(
         summary="Listar todos los resumes",
-        description="Retorna una lista todos los resumes del usuario autenticado.",
+        description="Retorna una lista todos los resumes del usuario..",
         responses={200: ResumeSerializer(many=True)},
     )
     def get(self, request, *args, **kwargs):
@@ -52,18 +78,40 @@ class ResumeListCreateView(generics.ListCreateAPIView):
 
 @extend_schema(tags=["Templates"])
 class TemplateListResumeTemplateUpdateView(APIView):
-
+    @extend_schema(
+        summary="Listar todos los templates",
+        description="Retorna una lista todos los templates.",
+        responses={200: TemplateSerializer(many=True)},
+    )
     def get(self, request, *args, **kwargs):
         templates = Template.objects.all()
         serializer = TemplateSerializer(templates, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @extend_schema(
+        summary="Actualizar un template",
+        description="Actualiza el template de un resumen especifico del usuario..",
+        request=ResumeSerializer,
+        responses={200: ResumeSerializer},
+        examples=[
+            OpenApiExample(
+                "Ejemplo de actualización de template",
+                summary="Ejemplo de datos correctos",
+                description="Este es un ejemplo de cómo debería verse una solicitud exitosa.",
+                value={
+                    "resume_id": 1,
+                    "template_selected": 2,
+                },
+                request_only=True,
+            )
+        ],
+    )
     def patch(self, request, *args, **kwargs):
         try:
             resume_id = request.data.pop("resume_id")
             template_selected = request.data.pop("template_selected")
             if resume_id and template_selected:
-                # Verifica que el resume pertenece al usuario autenticado
+                # Verifica que el resume pertenece al usuario.
                 resume = Resume.objects.get(id=resume_id, user=request.user)
                 template = Template.objects.get(id=template_selected)
                 resume.template_selected = template
