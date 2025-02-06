@@ -16,7 +16,7 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView
 from resume_app.views import (
     ResumeDetailUpdateDestroyView,
@@ -24,21 +24,43 @@ from resume_app.views import (
     TemplateListResumeTemplateUpdateView,
     CustomTokenRefreshView,
 )
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path(
-        "v1/resumes/<int:id>/",
-        ResumeDetailUpdateDestroyView.as_view(),
-        name="resume-detail-destroy",
+        "v1/",
+        include(
+            [
+                path("schema/", SpectacularAPIView.as_view(), name="schema"),
+                path(
+                    "swagger/",
+                    SpectacularSwaggerView.as_view(url_name="schema"),
+                    name="swagger-ui",
+                ),
+                path(
+                    "resumes/<int:id>/",
+                    ResumeDetailUpdateDestroyView.as_view(),
+                    name="resume-detail-destroy",
+                ),
+                path(
+                    "resumes/",
+                    ResumeListCreateView.as_view(),
+                    name="resume-list-create",
+                ),
+                path(
+                    "templates/",
+                    TemplateListResumeTemplateUpdateView.as_view(),
+                    name="template-list-resume-template-update",
+                ),
+                path("login/", TokenObtainPairView.as_view(), name="login"),
+                path(
+                    "refresh-token/",
+                    CustomTokenRefreshView.as_view(),
+                    name="refresh_token",
+                ),
+                # path("logout/", LogoutView.as_view(), name="logout"),
+            ]
+        ),
     ),
-    path("v1/resumes/", ResumeListCreateView.as_view(), name="resume-list-create"),
-    path(
-        "v1/templates/",
-        TemplateListResumeTemplateUpdateView.as_view(),
-        name="template-list-resume-template-update",
-    ),
-    path("v1/login/", TokenObtainPairView.as_view(), name="login"),
-    path("v1/refresh-token/", CustomTokenRefreshView.as_view(), name="refresh_token"),
-    # path("logout/", LogoutView.as_view(), name="logout"),
 ]

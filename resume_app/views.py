@@ -4,12 +4,14 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
-from .middleware import is_ip_in_range
+from drf_spectacular.utils import extend_schema
 
+from .middleware import is_ip_in_range
 from .models import Resume, Template
 from .serializers import ResumeSerializer, TemplateSerializer
 
 
+@extend_schema(tags=["Resumes"])
 class ResumeDetailUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ResumeSerializer
     lookup_field = "id"
@@ -18,6 +20,7 @@ class ResumeDetailUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
         return Resume.objects.filter(user=self.request.user)
 
 
+@extend_schema(tags=["Resumes"])
 class ResumeListCreateView(generics.ListCreateAPIView):
     serializer_class = ResumeSerializer
 
@@ -29,7 +32,25 @@ class ResumeListCreateView(generics.ListCreateAPIView):
         # Asigna automáticamente el usuario autenticado al crear un resume
         serializer.save(user=self.request.user)
 
+    @extend_schema(
+        summary="Listar todos los resumes",
+        description="Retorna una lista todos los resumes del usuario autenticado.",
+        responses={200: ResumeSerializer(many=True)},
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
 
+    @extend_schema(
+        summary="Crear un nuevo resume",
+        description="Crea un nuevo resume en la base de datos y retorna el objeto creado.",
+        request=ResumeSerializer,
+        responses={201: ResumeSerializer},
+    )
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+
+
+@extend_schema(tags=["Templates"])
 class TemplateListResumeTemplateUpdateView(APIView):
 
     def get(self, request, *args, **kwargs):
