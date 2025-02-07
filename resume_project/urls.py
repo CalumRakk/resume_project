@@ -23,6 +23,7 @@ from resume_app.views import (
     ResumeListCreateView,
     TemplateListResumeTemplateUpdateView,
     CustomTokenRefreshView,
+    LogView,
 )
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from django.conf import settings
@@ -62,6 +63,9 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
+    urlpatterns += [
+        path("logs/", LogView.as_view(), name="view_logs"),
+    ]
     urlpatterns += [
         path(
             "v1/",

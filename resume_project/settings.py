@@ -188,7 +188,7 @@ if DEBUG:
             "file": {
                 "level": "INFO",
                 "class": "logging.FileHandler",
-                "filename": "refresh_token.log",
+                "filename": "logs_del_sistema.log",
                 "formatter": "custom_format",
             },
         },

@@ -1,4 +1,5 @@
 import logging
+from django.conf import settings
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -222,3 +223,35 @@ class CustomTokenRefreshView(TokenRefreshView):
         except TokenError as e:
             logger.error(f"Error al refrescar el token: {str(e)}")
             return Response({"error": str(e)}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+import os
+from django.http import HttpResponse, Http404
+from django.conf import settings
+from django.views import View
+from django.utils.encoding import smart_str
+from django.shortcuts import render
+
+
+class LogView(View):
+    """
+    Vista para visualizar y descargar los logs.
+    """
+
+    log_file_path = os.path.join(settings.BASE_DIR, "logs_del_sistema.log")
+
+    def get(self, request, *args, **kwargs):
+        if not os.path.exists(self.log_file_path):
+            raise Http404("El archivo de logs no existe.")
+
+        with open(self.log_file_path, "r") as log_file:
+            logs = log_file.read()
+
+        if "download" in request.GET:
+            response = HttpResponse(logs, content_type="text/plain")
+            response["Content-Disposition"] = (
+                f'attachment; filename="{smart_str("logs.txt")}"'
+            )
+            return response
+
+        return render(request, "resume_app/logs.html", {"logs": logs})
