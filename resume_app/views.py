@@ -244,12 +244,12 @@ class LogView(View):
 
         logs = csl.log_file_path.read_text()
         lines = logs.split("\n")
-        last_logs = lines[::-1][:100]
+        last_logs = lines[::-1][:50][::-1]
 
         if "download" in request.GET:
             response = HttpResponse(logs, content_type="text/plain")
             response["Content-Disposition"] = (
-                f'attachment; filename="{smart_str("logs.txt")}"'
+                f'attachment; filename="{smart_str(csl.log_file_path.name)}"'
             )
             return response
 

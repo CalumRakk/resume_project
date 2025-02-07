@@ -18,11 +18,11 @@ class JWTMetadataValidationMiddleware:
 
     def __call__(self, request):
         if request.path in self.excluded_paths:
-            logger.info(f"Ruta excluida de la validación de token: {request.path}")
+            logger.debug(f"Ruta excluida de la validación de token: {request.path}")
             response = self.get_response(request)
             return response
 
-        logger.info(
+        logger.debug(
             f"Iniciando middleware JWTMetadataValidationMiddleware para la ruta: {request.path}"
         )
         jwt_auth = JWTAuthentication()
@@ -30,16 +30,20 @@ class JWTMetadataValidationMiddleware:
             auth_result = jwt_auth.authenticate(request)
             if auth_result:
                 user, token = auth_result
-                logger.info(f"Token JWT encontrado para el usuario: {user.username}")
+                logger.info(
+                    f"Token JWT encontrado para el usuario: {user.username} en la ruta: {request.path}"
+                )
                 self.validate_token_metadata(token, request)
             else:
-                logger.warning("No se encontró un token JWT en la solicitud")
+                logger.warning(
+                    f"No se encontró un token JWT en la solicitud para la ruta: {request.path}"
+                )
         except TokenError as e:
             logger.error(f"Error en la validación del token: {str(e)}")
             return JsonResponse({"error": "Token inválido"}, status=401)
 
         response = self.get_response(request)
-        logger.info(
+        logger.debug(
             f"Middleware JWTMetadataValidationMiddleware completado para la ruta: {request.path}"
         )
         return response
