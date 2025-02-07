@@ -1,5 +1,9 @@
+import logging
 from rest_framework import serializers
 from .models import Resume, Skill, Experience, Template
+
+# Configuración del logger
+logger = logging.getLogger(__name__)
 
 
 class SkillSerializer(serializers.ModelSerializer):
@@ -10,7 +14,9 @@ class SkillSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "level", "keywords", "orden"]
 
     def validate(self, data):
+        logger.info(f"Validando datos de Skill: {data}")
         if "resume" not in data:
+            logger.warning("El campo 'resume' no está presente en los datos de Skill")
             return data
         return super().validate(data)
 
@@ -33,7 +39,11 @@ class ExperienceSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, data):
+        logger.info(f"Validando datos de Experience: {data}")
         if "resume" not in data:
+            logger.warning(
+                "El campo 'resume' no está presente en los datos de Experience"
+            )
             return data
         return super().validate(data)
 
@@ -46,6 +56,7 @@ class TemplateSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "descripcion", "componet_name", "customazation_rules"]
 
     def validate(self, attrs):
+        logger.info(f"Validando datos de Template: {attrs}")
         return super().validate(attrs)
 
 
@@ -65,6 +76,9 @@ class ResumeSerializer(serializers.ModelSerializer):
         """
         Sobrescribe la representación para incluir el template_selected como un objeto JSON.
         """
+        logger.info(
+            f"Convirtiendo instancia de Resume a representación JSON: {instance.id}"
+        )
         representation = super().to_representation(instance)
         if instance.template_selected:
             representation["template_selected"] = TemplateSerializer(
@@ -73,6 +87,7 @@ class ResumeSerializer(serializers.ModelSerializer):
         return representation
 
     def create(self, validated_data):
+        logger.info(f"Creando un nuevo Resume con datos: {validated_data}")
         user = self.context["request"].user
         validated_data["user"] = user
 
@@ -81,12 +96,17 @@ class ResumeSerializer(serializers.ModelSerializer):
         resume = Resume.objects.create(**validated_data)
 
         for experience_data in experiences_data:
+            logger.info(f"Creando Experience para el Resume: {resume.id}")
             Experience.objects.create(resume=resume, **experience_data)
         for skill_data in skills_data:
+            logger.info(f"Creando Skill para el Resume: {resume.id}")
             Skill.objects.create(resume=resume, **skill_data)
+
+        logger.info(f"Resume creado exitosamente: {resume.id}")
         return resume
 
     def update(self, instance, validated_data):
+        logger.info(f"Actualizando el Resume con ID: {instance.id}")
         user = self.context["request"].user
         validated_data["user"] = user
 
@@ -106,12 +126,19 @@ class ResumeSerializer(serializers.ModelSerializer):
             if skill_id:
                 try:
                     skill = instance.skills.get(id=skill_id)
+                    logger.info(
+                        f"Actualizando Skill con ID: {skill_id} para el Resume: {instance.id}"
+                    )
                     for key, value in skill_data.items():
                         setattr(skill, key, value)
                     skill.save()
                 except Skill.DoesNotExist:
+                    logger.warning(
+                        f"Skill con ID: {skill_id} no encontrado. Creando uno nuevo."
+                    )
                     Skill.objects.create(resume=instance, **skill_data)
             else:
+                logger.info(f"Creando un nuevo Skill para el Resume: {instance.id}")
                 Skill.objects.create(resume=instance, **skill_data)
 
         experience_ids_in_data = [i["id"] for i in experiences_data if i.get("id")]
@@ -121,12 +148,22 @@ class ResumeSerializer(serializers.ModelSerializer):
             if experience_id:
                 try:
                     experience = instance.experiences.get(id=experience_id)
+                    logger.info(
+                        f"Actualizando Experience con ID: {experience_id} para el Resume: {instance.id}"
+                    )
                     for key, value in experience_data.items():
                         setattr(experience, key, value)
                     experience.save()
                 except Experience.DoesNotExist:
+                    logger.warning(
+                        f"Experience con ID: {experience_id} no encontrado. Creando uno nuevo."
+                    )
                     Experience.objects.create(resume=instance, **experience_data)
             else:
+                logger.info(
+                    f"Creando un nuevo Experience para el Resume: {instance.id}"
+                )
                 Experience.objects.create(resume=instance, **experience_data)
 
+        logger.info(f"Resume actualizado exitosamente: {instance.id}")
         return instance

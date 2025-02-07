@@ -169,3 +169,34 @@ SPECTACULAR_SETTINGS = {
         "persistAuthorization": True,
     },
 }
+
+if DEBUG:
+    LOGGING = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "custom_format": {
+                "format": f"%(asctime)s {TIME_ZONE} - %(levelname)s - %(name)s - %(message)s",
+                "datefmt": "%Y-%m-%d %I:%M:%S %p",  # Formato de 12 horas
+            },
+        },
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
+                "formatter": "custom_format",
+            },
+            "file": {
+                "level": "INFO",
+                "class": "logging.FileHandler",
+                "filename": "refresh_token.log",
+                "formatter": "custom_format",
+            },
+        },
+        "loggers": {
+            "resume_app.views": {
+                "handlers": ["console", "file"],
+                "level": "INFO",
+                "propagate": True,
+            },
+        },
+    }

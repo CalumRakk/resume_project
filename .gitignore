@@ -5,3 +5,4 @@ investigacion/
 staticfiles/
 build.zip
 build.rar
+*.log
