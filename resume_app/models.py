@@ -30,8 +30,8 @@ class Resume(BaseModel):
 class Skill(BaseModel):
     name = models.CharField(max_length=100, default="Web Development")
     resume = models.ForeignKey(Resume, on_delete=models.CASCADE, related_name="skills")
-    level = models.CharField(default="Master", max_length=100)
-    keywords = models.JSONField(default=list)
+    level = models.CharField(default="Master", max_length=100, null=True)
+    keywords = models.JSONField(default=list, null=True)
     orden = models.PositiveIntegerField()
 
     class Meta:
@@ -46,11 +46,11 @@ class Skill(BaseModel):
 class Experience(BaseModel):
     name = models.CharField(max_length=100, default="Company Name")
     position = models.CharField(max_length=100, default="President")
-    url = models.URLField(default="https://company.com")
-    highlights = models.JSONField(default=list)
+    url = models.URLField(default="https://company.com", null=True)
+    highlights = models.JSONField(default=list, null=True)
     summary = models.TextField(default="Description…")
-    start_date = models.DateField()
-    end_date = models.DateField()
+    start_date = models.DateField(null=True)
+    end_date = models.DateField(null=True)
     resume = models.ForeignKey(
         Resume, on_delete=models.CASCADE, related_name="experiences"
     )
