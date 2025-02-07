@@ -198,5 +198,22 @@ if DEBUG:
                 "level": "INFO",
                 "propagate": True,
             },
+            "resume_app.middleware": {
+                "handlers": ["console", "file"],
+                "level": "INFO",
+                "propagate": True,
+            },
+            "resume_app.custom_jwt": {
+                "handlers": ["console", "file"],
+                "level": "INFO",
+                "propagate": True,
+            },
+            "resume_app.serializers": {
+                "handlers": ["console", "file"],
+                "level": "INFO",
+                "propagate": True,
+            },
         },
     }
+
+EXCLUDED_PATHS_FROM_TOKEN_VALIDATION = ["/v1/login/", "/v1/refresh-token/", "/logs/"]

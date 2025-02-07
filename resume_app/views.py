@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 from django.conf import settings
 from rest_framework import generics, status
 from rest_framework.response import Response
@@ -7,6 +8,11 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from drf_spectacular.utils import extend_schema, OpenApiExample
 from django.shortcuts import get_object_or_404
+from django.http import HttpResponse, Http404
+from django.views import View
+from django.utils.encoding import smart_str
+from django.shortcuts import render
+
 
 from .models import Resume, Template
 from .serializers import ResumeSerializer, TemplateSerializer
@@ -225,27 +231,20 @@ class CustomTokenRefreshView(TokenRefreshView):
             return Response({"error": str(e)}, status=status.HTTP_401_UNAUTHORIZED)
 
 
-import os
-from django.http import HttpResponse, Http404
-from django.conf import settings
-from django.views import View
-from django.utils.encoding import smart_str
-from django.shortcuts import render
-
-
 class LogView(View):
     """
     Vista para visualizar y descargar los logs.
     """
 
-    log_file_path = os.path.join(settings.BASE_DIR, "logs_del_sistema.log")
+    log_file_path = Path(settings.BASE_DIR) / "logs_del_sistema.log"
 
-    def get(self, request, *args, **kwargs):
-        if not os.path.exists(self.log_file_path):
+    def get(csl, request, *args, **kwargs):
+        if not csl.log_file_path.exists():
             raise Http404("El archivo de logs no existe.")
 
-        with open(self.log_file_path, "r") as log_file:
-            logs = log_file.read()
+        logs = csl.log_file_path.read_text()
+        lines = logs.split("\n")
+        last_logs = lines[::-1][:100]
 
         if "download" in request.GET:
             response = HttpResponse(logs, content_type="text/plain")
@@ -254,4 +253,4 @@ class LogView(View):
             )
             return response
 
-        return render(request, "resume_app/logs.html", {"logs": logs})
+        return render(request, "resume_app/logs.html", {"logs": "\n".join(last_logs)})
