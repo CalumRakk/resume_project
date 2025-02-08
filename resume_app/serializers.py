@@ -14,12 +14,12 @@ class SkillSerializer(serializers.ModelSerializer):
         model = Skill
         fields = ["id", "name", "level", "keywords", "orden"]
 
-    def validate(self, data):
-        logger.info(f"Validando datos de Skill: {data}")
-        if "resume" not in data:
-            logger.warning("El campo 'resume' no está presente en los datos de Skill")
-            return data
-        return super().validate(data)
+    def validate_id(self, value):
+        if self.context["request"].method == "POST" and value is not None:
+            raise serializers.ValidationError(
+                "No se debe proporcionar un ID al crear un Resume."
+            )
+        return value
 
 
 class ExperienceSerializer(serializers.ModelSerializer):
@@ -39,14 +39,12 @@ class ExperienceSerializer(serializers.ModelSerializer):
             "orden",
         ]
 
-    def validate(self, data):
-        logger.info(f"Validando datos de Experience: {data}")
-        if "resume" not in data:
-            logger.warning(
-                "El campo 'resume' no está presente en los datos de Experience"
+    def validate_id(self, value):
+        if self.context["request"].method == "POST" and value is not None:
+            raise serializers.ValidationError(
+                "No se debe proporcionar un ID al crear un Resume."
             )
-            return data
-        return super().validate(data)
+        return value
 
 
 class TemplateSerializer(serializers.ModelSerializer):
