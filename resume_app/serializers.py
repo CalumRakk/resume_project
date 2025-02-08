@@ -1,8 +1,9 @@
 import logging
 from rest_framework import serializers
 from .models import Resume, Skill, Experience, Template
+from django.core.validators import EmailValidator
 
-# Configuración del logger
+
 logger = logging.getLogger(__name__)
 
 
@@ -67,6 +68,25 @@ class ResumeSerializer(serializers.ModelSerializer):
         queryset=Template.objects.all(), required=False, write_only=True
     )
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    full_name = serializers.CharField(
+        max_length=100,
+        required=True,
+        allow_blank=False,
+        trim_whitespace=True,
+        help_text="Nombre completo del candidato.",
+    )
+    email = serializers.EmailField(
+        required=True,
+        validators=[EmailValidator(message="Ingrese un correo electrónico válido.")],
+        help_text="Dirección de correo electrónico del candidato.",
+    )
+    summary = serializers.CharField(
+        max_length=500,
+        required=False,
+        allow_blank=True,
+        trim_whitespace=True,
+        help_text="Resumen profesional del candidato (máximo 500 caracteres).",
+    )
 
     class Meta:
         model = Resume

@@ -30,7 +30,9 @@ class ResumeDetailUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     http_method_names = ["get", "post", "put", "delete"]
 
     def get_queryset(self):
-        return Resume.objects.filter(user=self.request.user)
+        return Resume.objects.filter(user=self.request.user).select_related(
+            "template_selected"
+        )
 
     @extend_schema(
         summary="Obtener un resume",
@@ -91,7 +93,9 @@ class ResumeListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         # Solo retorna los currículos del usuario.
-        return Resume.objects.filter(user=self.request.user)
+        return Resume.objects.filter(user=self.request.user).select_related(
+            "template_selected"
+        )
 
     def perform_create(self, serializer):
         # Asigna automáticamente el usuario al crear un resume
