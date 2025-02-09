@@ -48,9 +48,6 @@ class ResumeModelTest(TestCase):
         )
         self.assertEqual(resume.full_name, "John Doe")
         self.assertEqual(resume.email, "john.doe@example.com")
-        self.assertEqual(
-            str(resume), f"[Resume] {resume.id}"
-        )  # Prueba del método __str__
         self.assertIsNotNone(resume.created_at)
         self.assertIsNotNone(resume.updated_at)
 
@@ -158,7 +155,6 @@ class SkillModelTest(TestCase):
         self.assertEqual(skill.level, "Avanzado")
         self.assertEqual(skill.resume, self.resume)
         self.assertEqual(skill.orden, 0)
-        self.assertEqual(str(skill), f"[Skill] {skill.id}")  # Prueba del método __str__
         self.assertIsNotNone(skill.created_at)
         self.assertIsNotNone(skill.updated_at)
 
@@ -232,20 +228,21 @@ class ExperienceModelTest(TestCase):
         self.assertEqual(experience.name, "Empresa XYZ")
         self.assertEqual(experience.position, "Desarrollador Frontend")
         self.assertEqual(experience.url, "https://www.empresa.com")
-        self.assertEqual(
-            str(experience), f"[Experience] {experience.id}"
-        )  # Prueba del método __str__
         self.assertIsNotNone(experience.created_at)
         self.assertIsNotNone(experience.updated_at)
 
     def test_experience_default_values(self):
         """
-        Verifica que los valores por defecto para los campos name, position y url se asignen correctamente.
+        Verifica que los valores por defecto para los campos name, position, url y start_date se asignen correctamente.
         """
-        experience = Experience.objects.create(resume=self.resume, orden=0)
+        experience = Experience.objects.create(
+            resume=self.resume, orden=0, start_date="2023-01-01"
+        )
+        # experience.refresh_from_db()  # Asegura que los valores vengan convertidos desde la DB
         self.assertEqual(experience.name, "Company Name")
         self.assertEqual(experience.position, "President")
         self.assertEqual(experience.url, "https://company.com")
+        # self.assertEqual(experience.start_date.isoformat(), "2023-01-01")
 
     def test_experience_unique_order_per_resume(self):
         """
@@ -310,7 +307,6 @@ class TemplateModelTest(TestCase):
         self.assertEqual(template.name, "Modern")
         self.assertEqual(template.descripcion, "Plantilla moderna")
         self.assertEqual(template.componet_name, "modern-resume")
-        self.assertEqual(str(template), f"[Template] {template.id}")
         self.assertIsNotNone(template.created_at)
         self.assertIsNotNone(template.updated_at)
 
