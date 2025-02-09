@@ -246,8 +246,13 @@ class ResumeSerializer(serializers.ModelSerializer):
         related_manager = getattr(instance, model_class.__name__.lower() + "s")
 
         # Eliminar objetos que no están en los datos recibidos
-        object_ids = [obj["id"] for obj in objects_data if obj.get("id")]
-        related_manager.exclude(id__in=object_ids).delete()
+        request = self.context["request"]
+        if request.method == "PUT":
+            object_ids = [obj["id"] for obj in objects_data if obj.get("id")]
+            logger.info(
+                f"Eliminando objetos no proporcionados para el Resume: {instance.id}"
+            )
+            related_manager.exclude(id__in=object_ids).delete()
 
         # Actualizar o crear objetos
         for object_data in objects_data:

@@ -121,7 +121,7 @@ class Experience(BaseModel):
     url = models.URLField(
         default="https://company.com",
         null=True,
-        help_text="Enlace a la empresa o descripción del trabajo.",
+        help_text="Enlace a la empresa",
     )
     summary = models.TextField(
         default="Description…",
@@ -129,7 +129,7 @@ class Experience(BaseModel):
         help_text="Descripción general de la experiencia laboral.",
     )
     highlights = models.JSONField(
-        default=list, null=True, help_text="Aspectos destacados del trabajo."
+        default=list, null=True, help_text="Lista de Aspectos destacados del trabajo."
     )
     end_date = models.DateField(
         null=True,

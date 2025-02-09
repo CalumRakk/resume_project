@@ -71,6 +71,32 @@ Authorization: Bearer {{login.response.body.access}}
   "template_selected": 2
 }
 
+### ACTUALIZACIÓN PARCIAL DE UN RESUME
+PATCH  {{host}}/{{version}}/resumes/1/
+Content-Type: application/json
+User-Agent: {{userAgent}}
+Authorization: Bearer {{login.response.body.access}}
+
+{
+  "id": 1,
+  "skills": [
+    {
+      "id": 6,
+      "name": "Web Development",
+      "level": "Master",
+      "keywords": [
+        "HTML",
+        "CSS",
+        "JavaScript"
+      ],
+      "orden": 0
+    }
+  ],
+  "full_name": "Leonardo {{$guid}}",
+  "email": "leocasti@gmail.com"
+}
+
+
 ###
 
 DELETE  {{host}}/{{version}}/resumes/21/

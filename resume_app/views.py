@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 class ResumeDetailUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ResumeSerializer
     lookup_field = "id"
-    http_method_names = ["get", "post", "put", "delete"]
+    http_method_names = ["get", "post", "put", "delete", "patch"]
 
     def get_queryset(self):
         return Resume.objects.filter(user=self.request.user).select_related(
@@ -52,14 +52,14 @@ class ResumeDetailUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
             raise
 
     @extend_schema(
-        summary="Actualizacion de reemplazo de un resume",
-        description="Actualiza un Resumen completo en la base de datos. Reemplaza por completo los datos existentes con los nuevos datos proporcionados.",
+        summary="Actualizacion de reemplazo del resume",
+        description="Actualización de reemplazo de un Resumen completo en la base de datos. Reemplaza por completo los datos existentes con los nuevos datos proporcionados y recibe como respuesta el objeto completo actualizado.",
         request=ResumeSerializer,
         responses={200: ResumeSerializer},
     )
     def put(self, request, *args, **kwargs):
         logger.info(
-            f"Intentando actualizar el resume con ID: {kwargs.get('id')} para el usuario: {request.user}"
+            f"Intentando reemplazar el resume con ID: {kwargs.get('id')} para el usuario: {request.user}"
         )
         try:
             response = super().put(request, *args, **kwargs)
@@ -84,6 +84,46 @@ class ResumeDetailUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
             return response
         except Exception as e:
             logger.error(f"Error al eliminar el resume: {str(e)}")
+            raise
+
+    @extend_schema(
+        summary="Actualización parcial del resumen",
+        description="Actualización parcial del resumen. Sólo se actualizan los campos proporcionados y recibe como respuesta el objeto completo actualizado.",
+        request=ResumeSerializer,
+        responses={200: ResumeSerializer},
+        examples=[
+            OpenApiExample(
+                "Actualización parcial del resumen.",
+                summary="Ejemplo de datos parciales",
+                value={
+                    "name": "nuevo nombre",
+                    "summary": "nuevo summary",
+                    "skills": [
+                        {
+                            "id": 1,
+                            "name": "actualiza el skill",
+                            "level": "Avanzado",
+                            "orden": 0,
+                        },
+                        {"name": "crea un nuevo skill", "level": "Experto", "orden": 1},
+                    ],
+                },
+                request_only=True,
+            ),
+        ],
+    )
+    def patch(self, request, *args, **kwargs):
+        logger.info(
+            f"Intentando actualizar el template para el resume: {kwargs.get('id')}"
+        )
+        try:
+            response = super().patch(request, *args, **kwargs)
+            logger.info(
+                f"Template actualizado exitosamente para el resume: {kwargs.get('id')}"
+            )
+            return response
+        except Exception as e:
+            logger.error(f"Error al actualizar el template: {str(e)}")
             raise
 
 
