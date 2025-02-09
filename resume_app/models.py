@@ -14,11 +14,11 @@ class BaseModel(models.Model):
 
 
 class Resume(BaseModel):
-    full_name = models.CharField(max_length=100)
-    email = models.EmailField()
+    full_name = models.CharField(max_length=100, null=True)
+    email = models.EmailField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    summary = models.TextField()
+    summary = models.TextField(null=True)
     template_selected = models.ForeignKey(
         "Template", on_delete=models.CASCADE, related_name="resumes", null=True
     )
@@ -30,9 +30,9 @@ class Resume(BaseModel):
 class Skill(BaseModel):
     name = models.CharField(max_length=100, default="Web Development")
     resume = models.ForeignKey(Resume, on_delete=models.CASCADE, related_name="skills")
-    level = models.CharField(default="Master", max_length=100, null=True)
-    keywords = models.JSONField(default=list, null=True)
     orden = models.PositiveIntegerField()
+    keywords = models.JSONField(default=list, null=True)
+    level = models.CharField(default="Master", max_length=100, null=True)
 
     class Meta:
         ordering = ["orden"]
@@ -46,15 +46,15 @@ class Skill(BaseModel):
 class Experience(BaseModel):
     name = models.CharField(max_length=100, default="Company Name")
     position = models.CharField(max_length=100, default="President")
-    url = models.URLField(default="https://company.com", null=True)
-    highlights = models.JSONField(default=list, null=True)
-    summary = models.TextField(default="Description…")
-    start_date = models.DateField(null=True)
-    end_date = models.DateField(null=True)
+    start_date = models.DateField()
     resume = models.ForeignKey(
         Resume, on_delete=models.CASCADE, related_name="experiences"
     )
     orden = models.PositiveIntegerField()
+    url = models.URLField(default="https://company.com", null=True)
+    summary = models.TextField(default="Description…", null=True)
+    highlights = models.JSONField(default=list, null=True)
+    end_date = models.DateField(null=True)
 
     class Meta:
         ordering = ["orden"]
@@ -68,9 +68,9 @@ class Experience(BaseModel):
 
 class Template(BaseModel):
     name = models.CharField(max_length=100)
-    descripcion = models.TextField()
     componet_name = models.CharField(max_length=100)
     customazation_rules = models.JSONField(default=list)
+    descripcion = models.TextField(null=True)
 
 
 class ResumeTemplate(BaseModel):
