@@ -3,36 +3,84 @@ from django.conf import settings
 
 
 class BaseModel(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    """
+    Modelo base abstracto que proporciona las columnas `created_at` y `updated_at`
+    para registrar fechas de creación y modificación de los registros.
+    """
+
+    created_at = models.DateTimeField(
+        auto_now_add=True, help_text="Fecha de creación del registro."
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True, help_text="Fecha de última modificación del registro."
+    )
 
     class Meta:
         abstract = True
 
     def __str__(self):
-        return f"[{self.__class__.__name__}] {self.id}"
+        return f"[{self.__class__.__name__}] {getattr(self, 'name', '')} {self.id}"
 
 
 class Resume(BaseModel):
-    full_name = models.CharField(max_length=100, null=True)
-    email = models.EmailField(null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    summary = models.TextField(null=True)
+    """
+    Modelo que representa un resumen.
+    """
+
+    full_name = models.CharField(
+        max_length=100, null=True, help_text="Nombre completo del usuario."
+    )
+    email = models.EmailField(
+        null=True, help_text="Correo electrónico asociado al resumen."
+    )
+    summary = models.TextField(
+        null=True, help_text="Resumen o descripción general del usuario."
+    )
     template_selected = models.ForeignKey(
-        "Template", on_delete=models.CASCADE, related_name="resumes", null=True
+        "Template",
+        on_delete=models.CASCADE,
+        related_name="resumes",
+        null=True,
+        help_text="Plantilla seleccionada para la visualización del resumen.",
     )
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="resumes"
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="resumes",
+        help_text="Usuario dueño del resumen.",
     )
+
+    class Meta:
+        verbose_name = "Resumen"
+        verbose_name_plural = "Resúmenes"
 
 
 class Skill(BaseModel):
-    name = models.CharField(max_length=100, default="Web Development")
-    resume = models.ForeignKey(Resume, on_delete=models.CASCADE, related_name="skills")
-    orden = models.PositiveIntegerField()
-    keywords = models.JSONField(default=list, null=True)
-    level = models.CharField(default="Master", max_length=100, null=True)
+    """
+    Representa una habilidad dentro del resumen.
+    """
+
+    name = models.CharField(
+        max_length=100, default="Web Development", help_text="Nombre de la habilidad."
+    )
+    resume = models.ForeignKey(
+        Resume,
+        on_delete=models.CASCADE,
+        related_name="skills",
+        help_text="Resumen al que pertenece la habilidad.",
+    )
+    orden = models.PositiveIntegerField(
+        help_text="Orden en el que se mostrarán las habilidades en el resumen."
+    )
+    keywords = models.JSONField(
+        default=list, null=True, help_text="Palabras clave asociadas a la habilidad."
+    )
+    level = models.CharField(
+        default="Master",
+        max_length=100,
+        null=True,
+        help_text="Nivel de la habilidad (Ej: Básico, Avanzado, Experto).",
+    )
 
     class Meta:
         ordering = ["orden"]
@@ -41,45 +89,102 @@ class Skill(BaseModel):
                 fields=["resume", "orden"], name="unique_order_per_resume_skill"
             )
         ]
+        verbose_name = "Habilidad"
+        verbose_name_plural = "Habilidades"
 
 
 class Experience(BaseModel):
-    name = models.CharField(max_length=100, default="Company Name")
-    position = models.CharField(max_length=100, default="President")
-    start_date = models.DateField()
-    resume = models.ForeignKey(
-        Resume, on_delete=models.CASCADE, related_name="experiences"
+    """
+    Representa una experiencia laboral dentro del resumen.
+    """
+
+    name = models.CharField(
+        max_length=100,
+        default="Company Name",
+        help_text="Nombre de la empresa u organización.",
     )
-    orden = models.PositiveIntegerField()
-    url = models.URLField(default="https://company.com", null=True)
-    summary = models.TextField(default="Description…", null=True)
-    highlights = models.JSONField(default=list, null=True)
-    end_date = models.DateField(null=True)
+    position = models.CharField(
+        max_length=100,
+        default="President",
+        help_text="Puesto desempeñado en la empresa.",
+    )
+    start_date = models.DateField(help_text="Fecha de inicio del empleo.")
+    resume = models.ForeignKey(
+        Resume,
+        on_delete=models.CASCADE,
+        related_name="experiences",
+        help_text="Resumen al que pertenece la experiencia.",
+    )
+    orden = models.PositiveIntegerField(
+        help_text="Orden en el que se mostrarán las experiencias en el resumen."
+    )
+    url = models.URLField(
+        default="https://company.com",
+        null=True,
+        help_text="Enlace a la empresa o descripción del trabajo.",
+    )
+    summary = models.TextField(
+        default="Description…",
+        null=True,
+        help_text="Descripción general de la experiencia laboral.",
+    )
+    highlights = models.JSONField(
+        default=list, null=True, help_text="Aspectos destacados del trabajo."
+    )
+    end_date = models.DateField(
+        null=True,
+        help_text="Fecha de finalización del empleo. NULL si aún está en curso.",
+    )
 
     class Meta:
         ordering = ["orden"]
         constraints = [
-            # Garantiza que dos experiencias asociadas al mismo Resume no tengan el mismo orden.
             models.UniqueConstraint(
                 fields=["resume", "orden"], name="unique_order_per_resume_experience"
             )
         ]
+        verbose_name = "Experiencia"
+        verbose_name_plural = "Experiencias"
 
 
 class Template(BaseModel):
-    name = models.CharField(max_length=100)
-    componet_name = models.CharField(max_length=100)
-    customazation_rules = models.JSONField(default=list)
-    descripcion = models.TextField(null=True)
+    """
+    Representa una plantilla de diseño para los resúmenes.
+    """
 
+    name = models.CharField(max_length=100, help_text="Nombre de la plantilla.")
+    componet_name = models.CharField(
+        max_length=100, help_text="Nombre del componente web asociado a la plantilla."
+    )
+    customazation_rules = models.JSONField(
+        default=list, help_text="Reglas de personalización de la plantilla."
+    )
+    descripcion = models.TextField(null=True, help_text="Descripción de la plantilla.")
 
-class ResumeTemplate(BaseModel):
-    resume = models.ForeignKey(Resume, on_delete=models.CASCADE)
-    template = models.ForeignKey(Template, on_delete=models.CASCADE)
-    custom_styles = models.JSONField(default=list)
+    class Meta:
+        verbose_name = "Plantilla"
+        verbose_name_plural = "Plantillas"
 
 
 class ResumeCustomization(BaseModel):
-    resume = models.ForeignKey(Resume, on_delete=models.CASCADE)
-    template = models.ForeignKey(Template, on_delete=models.CASCADE)
-    custom_styles = models.JSONField(default=list)
+    """
+    Representa una personalización aplicada a un resumen con una plantilla específica.
+    """
+
+    resume = models.ForeignKey(
+        Resume,
+        on_delete=models.CASCADE,
+        help_text="Resumen al que se aplica la personalización.",
+    )
+    template = models.ForeignKey(
+        Template,
+        on_delete=models.CASCADE,
+        help_text="Plantilla seleccionada para la personalización.",
+    )
+    custom_styles = models.JSONField(
+        default=list, help_text="Estilos personalizados aplicados al resumen."
+    )
+
+    class Meta:
+        verbose_name = "Personalización de Resumen"
+        verbose_name_plural = "Personalización de Resúmenes"
