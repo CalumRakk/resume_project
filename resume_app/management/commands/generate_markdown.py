@@ -17,7 +17,7 @@ def generate_markdown():
                 "content type",
                 "session",
                 "outstanding token",
-                "backlisted toen",
+                "blacklisted token",
             ]:
                 continue
             f.write(f"## {model._meta.verbose_name_plural}\n\n")

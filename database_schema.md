@@ -76,13 +76,3 @@ Representa una personalización aplicada a un resumen con una plantilla específ
 | template | ForeignKey | ❌ | Plantilla seleccionada para la personalización. |
 | custom_styles | JSONField | ❌ | Estilos personalizados aplicados al resumen. |
 
-## blacklisted tokens
-
-BlacklistedToken(id, token, blacklisted_at)
-
-| Campo | Tipo | Permite NULL | Descripción |
-|-------|------|-------------|-------------|
-| id | BigAutoField | ❌ |  |
-| token | OneToOneField | ❌ |  |
-| blacklisted_at | DateTimeField | ❌ |  |
-

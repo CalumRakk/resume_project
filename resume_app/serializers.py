@@ -1,7 +1,12 @@
 import logging
+from typing import Dict, List, Any, Optional, Type
+
 from rest_framework import serializers
-from .models import Resume, Skill, Experience, Template
 from django.core.validators import EmailValidator
+from django.db.models import Model
+from django.db import transaction
+
+from .models import Resume, Skill, Experience, Template
 
 
 logger = logging.getLogger(__name__)
@@ -60,25 +65,29 @@ class TemplateSerializer(serializers.ModelSerializer):
 
 
 class ResumeSerializer(serializers.ModelSerializer):
-    skills = SkillSerializer(many=True, required=False)
-    experiences = ExperienceSerializer(many=True, required=False)
-    template_selected = serializers.PrimaryKeyRelatedField(
+    """
+    Serializador para el modelo Resume que maneja la creación y actualización de Resume.
+    """
+
+    skills: List[Dict[str, Any]] = SkillSerializer(many=True, required=False)
+    experiences: List[Dict[str, Any]] = ExperienceSerializer(many=True, required=False)
+    template_selected: Optional[int] = serializers.PrimaryKeyRelatedField(
         queryset=Template.objects.all(), required=False, write_only=True
     )
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    full_name = serializers.CharField(
+    full_name: str = serializers.CharField(
         max_length=100,
         required=True,
         allow_blank=False,
         trim_whitespace=True,
         help_text="Nombre completo del candidato.",
     )
-    email = serializers.EmailField(
+    email: str = serializers.EmailField(
         required=True,
         validators=[EmailValidator(message="Ingrese un correo electrónico válido.")],
         help_text="Dirección de correo electrónico del candidato.",
     )
-    summary = serializers.CharField(
+    summary: Optional[str] = serializers.CharField(
         max_length=500,
         required=False,
         allow_blank=True,
@@ -90,98 +99,176 @@ class ResumeSerializer(serializers.ModelSerializer):
         model = Resume
         fields = "__all__"
 
-    def to_representation(self, instance):
+    def to_representation(self, instance: Resume) -> Dict[str, Any]:
         """
-        Sobrescribe la representación para incluir el template_selected como un objeto JSON.
+        Convierte una instancia de Resume a su representación JSON.
+
+        Args:
+            instance (Resume): Instancia del modelo Resume a serializar.
+
+        Returns:
+            Dict[str, Any]: Diccionario con la representación JSON del Resume.
         """
         logger.info(
             f"Convirtiendo instancia de Resume a representación JSON: {instance.id}"
         )
         representation = super().to_representation(instance)
+
         if instance.template_selected:
             representation["template_selected"] = TemplateSerializer(
                 instance.template_selected
             ).data
         return representation
 
-    def create(self, validated_data):
-        logger.info(f"Creando un nuevo Resume con datos: {validated_data}")
-        user = self.context["request"].user
-        validated_data["user"] = user
+    @transaction.atomic
+    def create(self, validated_data: Dict[str, Any]) -> Resume:
+        """
+        Crea una nueva instancia de Resume con sus relaciones dentro de una transacción.
+        Si ocurre algún error durante la creación de las relaciones, se hace rollback
+        de todas las operaciones.
 
-        skills_data = validated_data.pop("skills", [])
-        experiences_data = validated_data.pop("experiences", [])
-        resume = Resume.objects.create(**validated_data)
+        Args:
+            validated_data (Dict[str, Any]): Datos validados para crear el Resume.
 
+        Returns:
+            Resume: Nueva instancia del modelo Resume creada.
+
+        Raises:
+            ValidationError: Si hay errores en la creación de objetos relacionados.
+            DatabaseError: Si hay errores en la base de datos.
+        """
+        logger.info(f"Iniciando transacción para crear nuevo Resume")
+        try:
+            # Extraer datos de relaciones
+            skills_data = validated_data.pop("skills", [])
+            experiences_data = validated_data.pop("experiences", [])
+
+            # Crear el Resume
+            resume = Resume.objects.create(**validated_data)
+
+            # Crear relaciones
+            self._create_related_objects(resume, experiences_data, skills_data)
+
+            logger.info(f"Resume creado exitosamente: {resume.id}")
+            return resume
+
+        except Exception as e:
+            logger.error(f"Error durante la creación del Resume: {str(e)}")
+            raise
+
+    @transaction.atomic
+    def update(self, instance: Resume, validated_data: Dict[str, Any]) -> Resume:
+        """
+        Actualiza una instancia existente de Resume y sus relaciones dentro de una
+        transacción. Si ocurre algún error durante la actualización, se hace rollback
+        de todas las operaciones.
+
+        Args:
+            instance (Resume): Instancia del modelo Resume a actualizar.
+            validated_data (Dict[str, Any]): Datos validados para la actualización.
+
+        Returns:
+            Resume: Instancia del modelo Resume actualizada.
+
+        Raises:
+            ValidationError: Si hay errores en la actualización de objetos relacionados.
+            DatabaseError: Si hay errores en la base de datos.
+        """
+        logger.info(f"Iniciando transacción para actualizar Resume: {instance.id}")
+        try:
+            # Extraer datos de relaciones
+            skills_data = validated_data.pop("skills", [])
+            experiences_data = validated_data.pop("experiences", [])
+
+            # Actualizar campos básicos
+            for key, value in validated_data.items():
+                setattr(instance, key, value)
+            instance.save()
+
+            # Actualizar relaciones
+            self._update_related_objects(instance, Skill, skills_data)
+            self._update_related_objects(instance, Experience, experiences_data)
+
+            logger.info(f"Resume actualizado exitosamente: {instance.id}")
+            return instance
+
+        except Exception as e:
+            logger.error(f"Error durante la actualización del Resume: {str(e)}")
+            raise
+
+    def _create_related_objects(
+        self,
+        resume: Resume,
+        experiences_data: List[Dict[str, Any]],
+        skills_data: List[Dict[str, Any]],
+    ) -> None:
+        """
+        Crea los objetos relacionados (experiencias y habilidades) para un Resume.
+        Esta función se ejecuta dentro de una transacción controlada por el método create().
+
+        Args:
+            resume (Resume): Instancia del modelo Resume.
+            experiences_data (List[Dict[str, Any]]): Datos de experiencias a crear.
+            skills_data (List[Dict[str, Any]]): Datos de habilidades a crear.
+
+        Raises:
+            ValidationError: Si hay errores en los datos proporcionados.
+            DatabaseError: Si hay errores en la base de datos.
+        """
         for experience_data in experiences_data:
             logger.info(f"Creando Experience para el Resume: {resume.id}")
             Experience.objects.create(resume=resume, **experience_data)
+
         for skill_data in skills_data:
             logger.info(f"Creando Skill para el Resume: {resume.id}")
             Skill.objects.create(resume=resume, **skill_data)
 
-        logger.info(f"Resume creado exitosamente: {resume.id}")
-        return resume
+    def _update_related_objects(
+        self,
+        instance: Resume,
+        model_class: Type[Model],
+        objects_data: List[Dict[str, Any]],
+    ) -> None:
+        """
+        Actualiza/reemplaza objetos relacionados (experiencias o habilidades) de un Resume.
+        Esta función se ejecuta dentro de una transacción controlada por el método update().
 
-    def update(self, instance, validated_data):
-        logger.info(f"Actualizando el Resume con ID: {instance.id}")
-        user = self.context["request"].user
-        validated_data["user"] = user
+        Args:
+            instance (Resume): Instancia del modelo Resume.
+            model_class (Type[Model]): Clase del modelo a actualizar (Skill o Experience).
+            objects_data (List[Dict[str, Any]]): Datos de los objetos a actualizar.
 
-        skills_data = validated_data.pop("skills", [])
-        experiences_data = validated_data.pop("experiences", [])
+        Raises:
+            ValidationError: Si hay errores en los datos proporcionados.
+            DatabaseError: Si hay errores en la base de datos.
+        """
+        # Nombre de la relación ('skills' o 'experiences').
+        related_manager = getattr(instance, model_class.__name__.lower() + "s")
 
-        for key, value in validated_data.items():
-            setattr(instance, key, value)
-        instance.save()
+        # Eliminar objetos que no están en los datos recibidos
+        object_ids = [obj["id"] for obj in objects_data if obj.get("id")]
+        related_manager.exclude(id__in=object_ids).delete()
 
-        # Obtener los IDs de los skills que están en el JSON
-        # Eliminar los skills que no están en el JSON
-        skill_ids_in_data = [i["id"] for i in skills_data if i.get("id")]
-        instance.skills.exclude(id__in=skill_ids_in_data).delete()
-        for skill_data in skills_data:
-            skill_id = skill_data.get("id")
-            if skill_id:
+        # Actualizar o crear objetos
+        for object_data in objects_data:
+            object_id = object_data.get("id")
+            if object_id:
                 try:
-                    skill = instance.skills.get(id=skill_id)
+                    related_object = related_manager.get(id=object_id)
                     logger.info(
-                        f"Actualizando Skill con ID: {skill_id} para el Resume: {instance.id}"
+                        f"Actualizando {model_class.__name__} con ID: {object_id}"
                     )
-                    for key, value in skill_data.items():
-                        setattr(skill, key, value)
-                    skill.save()
-                except Skill.DoesNotExist:
+                    for key, value in object_data.items():
+                        setattr(related_object, key, value)
+                    related_object.save()
+                except model_class.DoesNotExist:
                     logger.warning(
-                        f"Skill con ID: {skill_id} no encontrado. Creando uno nuevo."
+                        f"{model_class.__name__} con ID: {object_id} "
+                        "no encontrado. Creando nuevo."
                     )
-                    Skill.objects.create(resume=instance, **skill_data)
-            else:
-                logger.info(f"Creando un nuevo Skill para el Resume: {instance.id}")
-                Skill.objects.create(resume=instance, **skill_data)
-
-        experience_ids_in_data = [i["id"] for i in experiences_data if i.get("id")]
-        instance.experiences.exclude(id__in=experience_ids_in_data).delete()
-        for experience_data in experiences_data:
-            experience_id = experience_data.get("id")
-            if experience_id:
-                try:
-                    experience = instance.experiences.get(id=experience_id)
-                    logger.info(
-                        f"Actualizando Experience con ID: {experience_id} para el Resume: {instance.id}"
-                    )
-                    for key, value in experience_data.items():
-                        setattr(experience, key, value)
-                    experience.save()
-                except Experience.DoesNotExist:
-                    logger.warning(
-                        f"Experience con ID: {experience_id} no encontrado. Creando uno nuevo."
-                    )
-                    Experience.objects.create(resume=instance, **experience_data)
+                    related_manager.create(**object_data)
             else:
                 logger.info(
-                    f"Creando un nuevo Experience para el Resume: {instance.id}"
+                    f"Creando nuevo {model_class.__name__} para el Resume: {instance.id}"
                 )
-                Experience.objects.create(resume=instance, **experience_data)
-
-        logger.info(f"Resume actualizado exitosamente: {instance.id}")
-        return instance
+                related_manager.create(**object_data)
