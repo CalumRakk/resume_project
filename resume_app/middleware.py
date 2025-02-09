@@ -17,7 +17,9 @@ class JWTMetadataValidationMiddleware:
         )
 
     def __call__(self, request):
-        if request.path in self.excluded_paths:
+        if any(
+            request.path.startswith(public_path) for public_path in self.excluded_paths
+        ):
             logger.debug(f"Ruta excluida de la validación de token: {request.path}")
             response = self.get_response(request)
             return response

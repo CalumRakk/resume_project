@@ -216,4 +216,12 @@ if DEBUG:
         },
     }
 
-EXCLUDED_PATHS_FROM_TOKEN_VALIDATION = ["/v1/login/", "/v1/refresh-token/", "/logs/"]
+EXCLUDED_PATHS_FROM_TOKEN_VALIDATION = [
+    "/v1/login",
+    "/v1/refresh-token",
+    "/logs",
+    "/v1/swagger",
+    "/v1/schema",
+    "/admin",
+    "/favicon.ico",
+]
