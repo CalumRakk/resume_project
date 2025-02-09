@@ -75,29 +75,29 @@ class ResumeSerializer(serializers.ModelSerializer):
         queryset=Template.objects.all(), required=False, write_only=True
     )
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    full_name: str = serializers.CharField(
-        max_length=100,
-        required=True,
-        allow_blank=False,
-        trim_whitespace=True,
-        help_text="Nombre completo del candidato.",
-    )
-    email: str = serializers.EmailField(
-        required=True,
-        validators=[EmailValidator(message="Ingrese un correo electrónico válido.")],
-        help_text="Dirección de correo electrónico del candidato.",
-    )
-    summary: Optional[str] = serializers.CharField(
-        max_length=500,
-        required=False,
-        allow_blank=True,
-        trim_whitespace=True,
-        help_text="Resumen profesional del candidato (máximo 500 caracteres).",
-    )
 
     class Meta:
         model = Resume
         fields = "__all__"
+        extra_kwargs = {
+            "email": {"validators": [EmailValidator("Ingrese un correo válido.")]},
+        }
+
+    def validate(self, attrs):
+        """Valida que ningún campo string tenga más de 500 caracteres. Util para evitar campos json u otros muy grandes"""
+        max_length = 500
+        errors = {}
+
+        for field, value in attrs.items():
+            if len(str(value)) > max_length:
+                errors[field] = (
+                    f"El campo {field} debe tener menos de {max_length} caracteres."
+                )
+
+        if errors:
+            raise serializers.ValidationError(errors)
+
+        return attrs
 
     def to_representation(self, instance: Resume) -> Dict[str, Any]:
         """

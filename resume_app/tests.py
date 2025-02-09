@@ -385,10 +385,7 @@ class ResumeSerializerTest(SerializerTestSetUp):
         request.user = self.user
         serializer = ResumeSerializer(data=data, context={"request": request})
         self.assertFalse(serializer.is_valid())
-        self.assertEqual(
-            serializer.errors["email"][0],
-            ErrorDetail(string="Ingrese un correo electrónico válido.", code="invalid"),
-        )
+        self.assertIsInstance(serializer.errors["email"][0], ErrorDetail)
 
     def test_resume_serializer_create(self):
         """

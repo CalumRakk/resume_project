@@ -34,7 +34,9 @@ class Resume(BaseModel):
         null=True, help_text="Correo electrónico asociado al resumen."
     )
     summary = models.TextField(
-        null=True, help_text="Resumen o descripción general del usuario."
+        null=True,
+        help_text="Resumen o descripción general del usuario.",
+        max_length=500,
     )
     template_selected = models.ForeignKey(
         "Template",
@@ -73,7 +75,9 @@ class Skill(BaseModel):
         help_text="Orden en el que se mostrarán las habilidades en el resumen."
     )
     keywords = models.JSONField(
-        default=list, null=True, help_text="Palabras clave asociadas a la habilidad."
+        default=list,
+        null=True,
+        help_text="Palabras clave asociadas a la habilidad.",
     )
     level = models.CharField(
         default="Master",
@@ -122,11 +126,13 @@ class Experience(BaseModel):
         default="https://company.com",
         null=True,
         help_text="Enlace a la empresa",
+        max_length=100,
     )
     summary = models.TextField(
         default="Description…",
         null=True,
         help_text="Descripción general de la experiencia laboral.",
+        max_length=500,
     )
     highlights = models.JSONField(
         default=list, null=True, help_text="Lista de Aspectos destacados del trabajo."
@@ -159,7 +165,9 @@ class Template(BaseModel):
     customazation_rules = models.JSONField(
         default=list, help_text="Reglas de personalización de la plantilla."
     )
-    descripcion = models.TextField(null=True, help_text="Descripción de la plantilla.")
+    descripcion = models.TextField(
+        null=True, help_text="Descripción de la plantilla.", max_length=500
+    )
 
     class Meta:
         verbose_name = "Plantilla"

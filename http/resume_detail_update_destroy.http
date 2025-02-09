@@ -78,7 +78,6 @@ User-Agent: {{userAgent}}
 Authorization: Bearer {{login.response.body.access}}
 
 {
-  "id": 1,
   "skills": [
     {
       "id": 6,
@@ -94,6 +93,7 @@ Authorization: Bearer {{login.response.body.access}}
   ],
   "full_name": "Leonardo {{$guid}}",
   "email": "leocasti@gmail.com"
+  
 }
 
 
