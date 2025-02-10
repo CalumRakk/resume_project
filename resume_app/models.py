@@ -79,7 +79,7 @@ class Skill(BaseModel):
         default=list,
         null=True,
         help_text="Palabras clave asociadas a la habilidad.",
-        validators=[validate_list],
+        validators=[validate_list(50)],
     )
     level = models.CharField(
         default="Master",
@@ -140,7 +140,7 @@ class Experience(BaseModel):
         default=list,
         null=True,
         help_text="Lista de Aspectos destacados del trabajo.",
-        validators=[validate_list],
+        validators=[validate_list(25)],
     )
     end_date = models.DateField(
         null=True,

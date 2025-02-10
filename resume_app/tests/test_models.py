@@ -5,8 +5,8 @@ from django.contrib.auth.models import User
 from django.test import TestCase, RequestFactory
 from rest_framework.exceptions import ErrorDetail
 
-from .models import Resume, Skill, Experience, Template
-from .serializers import (
+from resume_app.models import Resume, Skill, Experience, Template
+from resume_app.serializers import (
     ResumeSerializer,
     SkillSerializer,
     ExperienceSerializer,
