@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from .utils import validate_list
 
 
 class BaseModel(models.Model):
@@ -78,6 +79,7 @@ class Skill(BaseModel):
         default=list,
         null=True,
         help_text="Palabras clave asociadas a la habilidad.",
+        validators=[validate_list],
     )
     level = models.CharField(
         default="Master",
@@ -135,7 +137,10 @@ class Experience(BaseModel):
         max_length=500,
     )
     highlights = models.JSONField(
-        default=list, null=True, help_text="Lista de Aspectos destacados del trabajo."
+        default=list,
+        null=True,
+        help_text="Lista de Aspectos destacados del trabajo.",
+        validators=[validate_list],
     )
     end_date = models.DateField(
         null=True,

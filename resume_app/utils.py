@@ -1,5 +1,11 @@
 from django.http import HttpRequest
 import ipaddress
+from rest_framework.exceptions import ValidationError
+
+
+def validate_list(value, max_length=50):
+    if isinstance(value, list) and len(value) > max_length:
+        raise ValidationError("La lista no puede contener más de 100 elementos.")
 
 
 def is_ip_in_range(user_ip, allowed_range):

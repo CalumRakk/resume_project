@@ -83,22 +83,6 @@ class ResumeSerializer(serializers.ModelSerializer):
             "email": {"validators": [EmailValidator("Ingrese un correo válido.")]},
         }
 
-    def validate(self, attrs):
-        """Valida que ningún campo string tenga más de 500 caracteres. Util para evitar campos json u otros muy grandes"""
-        max_length = 500
-        errors = {}
-
-        for field, value in attrs.items():
-            if len(str(value)) > max_length:
-                errors[field] = (
-                    f"El campo {field} debe tener menos de {max_length} caracteres."
-                )
-
-        if errors:
-            raise serializers.ValidationError(errors)
-
-        return attrs
-
     def to_representation(self, instance: Resume) -> Dict[str, Any]:
         """
         Convierte una instancia de Resume a su representación JSON.

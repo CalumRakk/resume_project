@@ -5,3 +5,4 @@ staticfiles/
 build.zip
 build.rar
 *.log
+script.py
