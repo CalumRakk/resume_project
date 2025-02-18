@@ -17,7 +17,7 @@ class SkillSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Skill
-        fields = ["id", "name", "level", "keywords", "orden"]
+        fields = ["id", "name", "level", "keywords", "order"]
 
     def validate_id(self, value):
         if self.context["request"].method == "POST" and value is not None:
@@ -41,7 +41,7 @@ class ExperienceSerializer(serializers.ModelSerializer):
             "summary",
             "start_date",
             "end_date",
-            "orden",
+            "order",
         ]
 
     def validate_id(self, value):

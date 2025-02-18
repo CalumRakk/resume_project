@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from .utils import validate_list
+from resume_app.utils import check_list_does_not_exceed_50
 
 
 class BaseModel(models.Model):
@@ -72,14 +72,14 @@ class Skill(BaseModel):
         related_name="skills",
         help_text="Resumen al que pertenece la habilidad.",
     )
-    orden = models.PositiveIntegerField(
-        help_text="Orden en el que se mostrarán las habilidades en el resumen."
+    order = models.PositiveIntegerField(
+        help_text="order en el que se mostrarán las habilidades en el resumen."
     )
     keywords = models.JSONField(
         default=list,
         null=True,
         help_text="Palabras clave asociadas a la habilidad.",
-        validators=[validate_list(50)],
+        validators=[check_list_does_not_exceed_50],
     )
     level = models.CharField(
         default="Master",
@@ -89,10 +89,10 @@ class Skill(BaseModel):
     )
 
     class Meta:
-        ordering = ["orden"]
+        ordering = ["order"]
         constraints = [
             models.UniqueConstraint(
-                fields=["resume", "orden"], name="unique_order_per_resume_skill"
+                fields=["resume", "order"], name="unique_order_per_resume_skill"
             )
         ]
         verbose_name = "Habilidad"
@@ -121,8 +121,8 @@ class Experience(BaseModel):
         related_name="experiences",
         help_text="Resumen al que pertenece la experiencia.",
     )
-    orden = models.PositiveIntegerField(
-        help_text="Orden en el que se mostrarán las experiencias en el resumen."
+    order = models.PositiveIntegerField(
+        help_text="order en el que se mostrarán las experiencias en el resumen."
     )
     url = models.URLField(
         default="https://company.com",
@@ -140,7 +140,7 @@ class Experience(BaseModel):
         default=list,
         null=True,
         help_text="Lista de Aspectos destacados del trabajo.",
-        validators=[validate_list(25)],
+        validators=[check_list_does_not_exceed_50],
     )
     end_date = models.DateField(
         null=True,
@@ -148,10 +148,10 @@ class Experience(BaseModel):
     )
 
     class Meta:
-        ordering = ["orden"]
+        ordering = ["order"]
         constraints = [
             models.UniqueConstraint(
-                fields=["resume", "orden"], name="unique_order_per_resume_experience"
+                fields=["resume", "order"], name="unique_order_per_resume_experience"
             )
         ]
         verbose_name = "Experiencia"

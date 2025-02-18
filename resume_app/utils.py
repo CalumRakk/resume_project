@@ -3,23 +3,12 @@ import ipaddress
 from rest_framework.exceptions import ValidationError
 
 
-def validate_list(max_length=50):
-    """
-    Validador personalizado para verificar la longitud de una lista.
+def check_list_does_not_exceed_50(value):
+    if not isinstance(value, list):
+        raise ValidationError("El campo debe ser una lista.")
 
-    Args:
-        max_length (int, optional): Límite de elementos en la lista. Por defecto es 50.
-
-    Nota: Se debe llamar usando corchetes, por ejemplo: [validate_list(50)]
-    """
-
-    def validate_list(value):
-        if isinstance(value, list) and len(value) > max_length:
-            raise ValidationError(
-                f"La lista no puede contener más de {max_length} elementos."
-            )
-
-    return validate_list
+    if len(value) > 50:
+        raise ValidationError("La lista debe tener menos de 50 elementos.")
 
 
 def is_ip_in_range(user_ip, allowed_range):
