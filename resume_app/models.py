@@ -201,3 +201,9 @@ class ResumeCustomization(BaseModel):
     class Meta:
         verbose_name = "Personalización de Resumen"
         verbose_name_plural = "Personalización de Resúmenes"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["resume", "template"],
+                name="unique_resume_template_customization",
+            )
+        ]
