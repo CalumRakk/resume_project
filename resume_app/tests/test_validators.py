@@ -1,32 +1,29 @@
 from rest_framework.exceptions import ValidationError
 from django.test import TestCase
-from resume_app.utils import validate_list
+from resume_app.utils import check_list_does_not_exceed_50
 
 
 class ValidateListTestCase(TestCase):
-    def setUp(self):
-        self.validator_default = validate_list()
-        self.validator_custom = validate_list(25)
-
     def test_validate_list_within_limit(self):
         """Prueba que la validación pasa cuando la lista está dentro del límite"""
-        self.validator_default(list(range(50)))
-        self.validator_custom(list(range(25)))
+        check_list_does_not_exceed_50(list(range(50)))
 
     def test_validate_list_exceeds_limit(self):
         """Prueba que la validación lanza error si la lista excede el límite"""
         with self.assertRaises(ValidationError):
-            self.validator_default(list(range(51)))
-
-        with self.assertRaises(ValidationError):
-            self.validator_custom(list(range(26)))
+            check_list_does_not_exceed_50(list(range(51)))
 
     def test_validate_list_empty(self):
         """Prueba que la validación pasa con una lista vacía"""
-        self.validator_default([])
-        self.validator_custom([])
+        check_list_does_not_exceed_50([])
 
     def test_validate_list_non_list_type(self):
-        """Prueba que la validación ignora valores que no son listas"""
-        self.validator_default("string")
-        self.validator_custom(123)
+        """Prueba que la validación genera error a valores que no son listas"""
+        with self.assertRaises(ValidationError):
+            check_list_does_not_exceed_50("not a list")
+
+        with self.assertRaises(ValidationError):
+            check_list_does_not_exceed_50(123)
+
+        with self.assertRaises(ValidationError):
+            check_list_does_not_exceed_50({"key": "value"})

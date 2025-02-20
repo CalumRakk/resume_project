@@ -14,7 +14,7 @@ from django.utils.encoding import smart_str
 from django.shortcuts import render
 
 
-from .models import Resume, Template
+from .models import Resume, Template, ResumeCustomization
 from .serializers import ResumeSerializer, TemplateSerializer
 from .utils import get_client_ip, is_ip_in_range
 
@@ -30,9 +30,13 @@ class ResumeDetailUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     http_method_names = ["get", "post", "put", "delete", "patch"]
 
     def get_queryset(self):
-        return Resume.objects.filter(user=self.request.user).select_related(
-            "template_selected"
-        )
+        return Resume.get_with_customization(self.request.user)
+
+    def get_object(self):
+        """Sobreescribe get_object para asegurarse de que customization esté presente"""
+        obj = super().get_object()
+        obj.customization = next(iter(obj.customization_list), None)
+        return obj
 
     @extend_schema(
         summary="Obtener un resume",
@@ -133,9 +137,7 @@ class ResumeListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         # Solo retorna los currículos del usuario.
-        return Resume.objects.filter(user=self.request.user).select_related(
-            "template_selected"
-        )
+        return Resume.get_with_customization(self.request.user)
 
     def perform_create(self, serializer):
         # Asigna automáticamente el usuario al crear un resume

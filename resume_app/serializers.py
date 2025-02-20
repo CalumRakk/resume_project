@@ -6,7 +6,7 @@ from django.core.validators import EmailValidator
 from django.db.models import Model
 from django.db import transaction
 
-from .models import Resume, Skill, Experience, Template
+from .models import Resume, Skill, Experience, Template, ResumeCustomization
 
 
 logger = logging.getLogger(__name__)
@@ -17,7 +17,7 @@ class SkillSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Skill
-        fields = ["id", "name", "level", "keywords", "order"]
+        fields = ["id", "name", "level", "keywords"]
 
     def validate_id(self, value):
         if self.context["request"].method == "POST" and value is not None:
@@ -41,7 +41,6 @@ class ExperienceSerializer(serializers.ModelSerializer):
             "summary",
             "start_date",
             "end_date",
-            "order",
         ]
 
     def validate_id(self, value):
@@ -64,6 +63,16 @@ class TemplateSerializer(serializers.ModelSerializer):
         return super().validate(attrs)
 
 
+class ResumeCustomizationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ResumeCustomization
+        fields = ["id", "custom_styles"]
+        extra_kwargs = {
+            "resume": {"required": False},
+            "template": {"required": False},
+        }
+
+
 class ResumeSerializer(serializers.ModelSerializer):
     """
     Serializador para el modelo Resume que maneja la creación y actualización de Resume.
@@ -75,6 +84,7 @@ class ResumeSerializer(serializers.ModelSerializer):
         queryset=Template.objects.all(), required=False, write_only=True
     )
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    customization = serializers.SerializerMethodField()
 
     class Meta:
         model = Resume
@@ -103,6 +113,14 @@ class ResumeSerializer(serializers.ModelSerializer):
                 instance.template_selected
             ).data
         return representation
+
+    def get_customization(self, obj):
+        """Retorna la personalización (customization) de un Resume si está disponible."""
+        return (
+            ResumeCustomizationSerializer(obj.customization).data
+            if hasattr(obj, "customization")
+            else None
+        )
 
     @transaction.atomic
     def create(self, validated_data: Dict[str, Any]) -> Resume:

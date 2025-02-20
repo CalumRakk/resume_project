@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from resume_app.utils import check_list_does_not_exceed_50
+from django.db.models import Prefetch, F
 
 
 class BaseModel(models.Model):
@@ -57,6 +58,43 @@ class Resume(BaseModel):
         verbose_name = "Resumen"
         verbose_name_plural = "Resúmenes"
 
+    @classmethod
+    def get_with_customization(cls, user):
+        """
+        Obtiene la lista de resumes del usuario, prefetching la
+        personalización (`ResumeCustomization`) asociada con cada resume.
+
+        - Usa `select_related("template_selected")` para evitar consultas extra
+        al acceder a la relación con `Template`.
+        - Usa `prefetch_related` con `Prefetch` para cargar las personalizaciones
+        (`ResumeCustomization`) que coinciden con el template seleccionado de cada resume.
+        - Convierte `customization_list` en un solo objeto `customization` para
+        facilitar el acceso directo en las vistas.
+
+        Returns:
+            QuerySet: Lista de objetos `Resume`, cada uno con su `customization` precargado.
+        """
+        resumes = (
+            Resume.objects.filter(user=user)
+            .select_related("template_selected")
+            .prefetch_related(
+                Prefetch(
+                    "resumecustomization_set",
+                    queryset=ResumeCustomization.objects.filter(
+                        template=F("resume__template_selected")
+                    ),
+                    to_attr="customization_list",
+                )
+            )
+        )
+
+        for resume in resumes:
+            setattr(
+                resume, "customization", next(iter(resume.customization_list), None)
+            )
+
+        return resumes
+
 
 class Skill(BaseModel):
     """
@@ -72,9 +110,6 @@ class Skill(BaseModel):
         related_name="skills",
         help_text="Resumen al que pertenece la habilidad.",
     )
-    order = models.PositiveIntegerField(
-        help_text="order en el que se mostrarán las habilidades en el resumen."
-    )
     keywords = models.JSONField(
         default=list,
         null=True,
@@ -89,12 +124,6 @@ class Skill(BaseModel):
     )
 
     class Meta:
-        ordering = ["order"]
-        constraints = [
-            models.UniqueConstraint(
-                fields=["resume", "order"], name="unique_order_per_resume_skill"
-            )
-        ]
         verbose_name = "Habilidad"
         verbose_name_plural = "Habilidades"
 
@@ -121,9 +150,6 @@ class Experience(BaseModel):
         related_name="experiences",
         help_text="Resumen al que pertenece la experiencia.",
     )
-    order = models.PositiveIntegerField(
-        help_text="order en el que se mostrarán las experiencias en el resumen."
-    )
     url = models.URLField(
         default="https://company.com",
         null=True,
@@ -148,12 +174,6 @@ class Experience(BaseModel):
     )
 
     class Meta:
-        ordering = ["order"]
-        constraints = [
-            models.UniqueConstraint(
-                fields=["resume", "order"], name="unique_order_per_resume_experience"
-            )
-        ]
         verbose_name = "Experiencia"
         verbose_name_plural = "Experiencias"
 
