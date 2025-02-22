@@ -57,7 +57,7 @@ class ResumeDetailUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 
     @extend_schema(
         summary="Actualizacion de reemplazo del resume",
-        description="Actualización de reemplazo de un Resumen completo en la base de datos. Reemplaza por completo los datos existentes con los nuevos datos proporcionados y recibe como respuesta el objeto completo actualizado.",
+        description="Actualización de reemplazo de un Resumen. Actualiza los campos proporcionados del resume, y los elementos de los campos relacionados ( como skills, experience) serán creados, actualizados o eliminados según estén proporcionados en la solicitud. Retorna el objeto completo actualizado.",
         request=ResumeSerializer,
         responses={200: ResumeSerializer},
     )
@@ -107,9 +107,8 @@ class ResumeDetailUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
                             "id": 1,
                             "name": "actualiza el skill",
                             "level": "Avanzado",
-                            "orden": 0,
                         },
-                        {"name": "crea un nuevo skill", "level": "Experto", "orden": 1},
+                        {"name": "crea un nuevo skill", "level": "Experto"},
                     ],
                 },
                 request_only=True,
@@ -162,15 +161,45 @@ class ResumeListCreateView(generics.ListCreateAPIView):
 
     @extend_schema(
         summary="Crear un nuevo resume",
-        description="Crea un nuevo resume en la base de datos y retorna el objeto creado.",
+        description="Crea un nuevo resume con los datos proporcionados y devuelve el objeto creado.",
         request=ResumeSerializer,
         responses={201: ResumeSerializer},
+        examples=[
+            OpenApiExample(
+                "Ejemplo de creación de resume",
+                summary="Ejemplo de datos para crear un resume",
+                value={
+                    "name": "Mi nuevo resume",
+                    "summary": "Este es un resumen profesional.",
+                    "skills": [
+                        {"name": "Python", "level": "Experto"},
+                        {"name": "Django", "level": "Avanzado"},
+                    ],
+                    "experience": [
+                        {
+                            "company": "Empresa XYZ",
+                            "position": "Desarrollador",
+                            "start_date": "2020-01-01",
+                            "end_date": "2022-12-31",
+                        }
+                    ],
+                    "customization": {
+                        "styles": {
+                            "font": "Arial",
+                            "color_scheme": "dark",
+                            "margin": "10px",
+                        },
+                    },
+                },
+                request_only=True,
+            )
+        ],
     )
     def post(self, request, *args, **kwargs):
         logger.info(f"Intentando crear un nuevo resume para el usuario: {request.user}")
         try:
             response = super().post(request, *args, **kwargs)
-            logger.info(f"Resume creado exitosamente para el usuario: {request.user}")
+            logger.info(f"Resume creado exitosamente con ID: {response.data.get('id')}")
             return response
         except Exception as e:
             logger.error(f"Error al crear el resume: {str(e)}")

@@ -114,7 +114,7 @@ class ResumeSerializer(serializers.ModelSerializer):
             ).data
         return representation
 
-    def get_customization(self, obj):
+    def get_customization(self, obj) -> ResumeCustomizationSerializer:
         """Retorna la personalización (customization) de un Resume si está disponible."""
         return (
             ResumeCustomizationSerializer(obj.customization).data
