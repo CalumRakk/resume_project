@@ -169,20 +169,28 @@ class ResumeListCreateView(generics.ListCreateAPIView):
                 "Ejemplo de creación de resume",
                 summary="Ejemplo de datos para crear un resume",
                 value={
-                    "name": "Mi nuevo resume",
-                    "summary": "Este es un resumen profesional.",
                     "skills": [
-                        {"name": "Python", "level": "Experto"},
-                        {"name": "Django", "level": "Avanzado"},
-                    ],
-                    "experience": [
                         {
-                            "company": "Empresa XYZ",
-                            "position": "Desarrollador",
-                            "start_date": "2020-01-01",
-                            "end_date": "2022-12-31",
+                            "name": "Web Development",
+                            "level": "Master",
+                            "keywords": ["HTML", "CSS", "JavaScript"],
                         }
                     ],
+                    "experiences": [
+                        {
+                            "name": "Desarrollador Web",
+                            "position": "Full Stack Developer",
+                            "url": "https://company.com",
+                            "highlights": [],
+                            "summary": "Parte del equipo de desarrollo.",
+                            "start_date": "2025-01-10",
+                            "end_date": "2025-01-10",
+                        }
+                    ],
+                    "full_name": "Leonardo",
+                    "email": "mi_email@gmail.com",
+                    "summary": "Apasionado del desarrollo web y estudiante un curso de desarrollador web.",
+                    "template_selected": 2,
                     "customization": {
                         "styles": {
                             "font": "Arial",
