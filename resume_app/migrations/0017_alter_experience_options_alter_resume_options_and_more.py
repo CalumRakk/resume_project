@@ -8,212 +8,328 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('resume_app', '0016_alter_experience_start_date_alter_experience_summary_and_more'),
+        (
+            "resume_app",
+            "0016_alter_experience_start_date_alter_experience_summary_and_more",
+        ),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='experience',
-            options={'ordering': ['orden'], 'verbose_name': 'Experiencia', 'verbose_name_plural': 'Experiencias'},
+            name="experience",
+            options={
+                "ordering": ["orden"],
+                "verbose_name": "Experiencia",
+                "verbose_name_plural": "Experiencias",
+            },
         ),
         migrations.AlterModelOptions(
-            name='resume',
-            options={'verbose_name': 'Resumen', 'verbose_name_plural': 'Resúmenes'},
+            name="resume",
+            options={"verbose_name": "Resumen", "verbose_name_plural": "Resúmenes"},
         ),
         migrations.AlterModelOptions(
-            name='resumecustomization',
-            options={'verbose_name': 'Personalización de Resumen', 'verbose_name_plural': 'Personalización de Resúmenes'},
+            name="resumecustomization",
+            options={
+                "verbose_name": "Personalización de Resumen",
+                "verbose_name_plural": "Personalización de Resúmenes",
+            },
         ),
         migrations.AlterModelOptions(
-            name='skill',
-            options={'ordering': ['orden'], 'verbose_name': 'Habilidad', 'verbose_name_plural': 'Habilidades'},
+            name="skill",
+            options={
+                "ordering": ["orden"],
+                "verbose_name": "Habilidad",
+                "verbose_name_plural": "Habilidades",
+            },
         ),
         migrations.AlterModelOptions(
-            name='template',
-            options={'verbose_name': 'Plantilla', 'verbose_name_plural': 'Plantillas'},
+            name="template",
+            options={"verbose_name": "Plantilla", "verbose_name_plural": "Plantillas"},
         ),
         migrations.AlterField(
-            model_name='experience',
-            name='created_at',
-            field=models.DateTimeField(auto_now_add=True, help_text='Fecha de creación del registro.'),
+            model_name="experience",
+            name="created_at",
+            field=models.DateTimeField(
+                auto_now_add=True, help_text="Fecha de creación del registro."
+            ),
         ),
         migrations.AlterField(
-            model_name='experience',
-            name='end_date',
-            field=models.DateField(help_text='Fecha de finalización del empleo. NULL si aún está en curso.', null=True),
+            model_name="experience",
+            name="end_date",
+            field=models.DateField(
+                help_text="Fecha de finalización del empleo. NULL si aún está en curso.",
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='experience',
-            name='highlights',
-            field=models.JSONField(default=list, help_text='Aspectos destacados del trabajo.', null=True),
+            model_name="experience",
+            name="highlights",
+            field=models.JSONField(
+                default=list, help_text="Aspectos destacados del trabajo.", null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='experience',
-            name='name',
-            field=models.CharField(default='Company Name', help_text='Nombre de la empresa u organización.', max_length=100),
+            model_name="experience",
+            name="name",
+            field=models.CharField(
+                default="Company Name",
+                help_text="Nombre de la empresa u organización.",
+                max_length=100,
+            ),
         ),
         migrations.AlterField(
-            model_name='experience',
-            name='orden',
-            field=models.PositiveIntegerField(help_text='Orden en el que se mostrarán las experiencias en el resumen.'),
+            model_name="experience",
+            name="orden",
+            field=models.PositiveIntegerField(
+                help_text="Orden en el que se mostrarán las experiencias en el resumen."
+            ),
         ),
         migrations.AlterField(
-            model_name='experience',
-            name='position',
-            field=models.CharField(default='President', help_text='Puesto desempeñado en la empresa.', max_length=100),
+            model_name="experience",
+            name="position",
+            field=models.CharField(
+                default="President",
+                help_text="Puesto desempeñado en la empresa.",
+                max_length=100,
+            ),
         ),
         migrations.AlterField(
-            model_name='experience',
-            name='resume',
-            field=models.ForeignKey(help_text='Resumen al que pertenece la experiencia.', on_delete=django.db.models.deletion.CASCADE, related_name='experiences', to='resume_app.resume'),
+            model_name="experience",
+            name="resume",
+            field=models.ForeignKey(
+                help_text="Resumen al que pertenece la experiencia.",
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="experiences",
+                to="resume_app.resume",
+            ),
         ),
         migrations.AlterField(
-            model_name='experience',
-            name='start_date',
-            field=models.DateField(help_text='Fecha de inicio del empleo.'),
+            model_name="experience",
+            name="start_date",
+            field=models.DateField(help_text="Fecha de inicio del empleo."),
         ),
         migrations.AlterField(
-            model_name='experience',
-            name='summary',
-            field=models.TextField(default='Description…', help_text='Descripción general de la experiencia laboral.', null=True),
+            model_name="experience",
+            name="summary",
+            field=models.TextField(
+                default="Description…",
+                help_text="Descripción general de la experiencia laboral.",
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='experience',
-            name='updated_at',
-            field=models.DateTimeField(auto_now=True, help_text='Fecha de última modificación del registro.'),
+            model_name="experience",
+            name="updated_at",
+            field=models.DateTimeField(
+                auto_now=True, help_text="Fecha de última modificación del registro."
+            ),
         ),
         migrations.AlterField(
-            model_name='experience',
-            name='url',
-            field=models.URLField(default='https://company.com', help_text='Enlace a la empresa o descripción del trabajo.', null=True),
+            model_name="experience",
+            name="url",
+            field=models.URLField(
+                default="https://company.com",
+                help_text="Enlace a la empresa o descripción del trabajo.",
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='resume',
-            name='created_at',
-            field=models.DateTimeField(auto_now_add=True, help_text='Fecha de creación del registro.'),
+            model_name="resume",
+            name="created_at",
+            field=models.DateTimeField(
+                auto_now_add=True, help_text="Fecha de creación del registro."
+            ),
         ),
         migrations.AlterField(
-            model_name='resume',
-            name='email',
-            field=models.EmailField(help_text='Correo electrónico asociado al resumen.', max_length=254, null=True),
+            model_name="resume",
+            name="email",
+            field=models.EmailField(
+                help_text="Correo electrónico asociado al resumen.",
+                max_length=254,
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='resume',
-            name='full_name',
-            field=models.CharField(help_text='Nombre completo del usuario.', max_length=100, null=True),
+            model_name="resume",
+            name="full_name",
+            field=models.CharField(
+                help_text="Nombre completo del usuario.", max_length=100, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='resume',
-            name='summary',
-            field=models.TextField(help_text='Resumen o descripción general del usuario.', null=True),
+            model_name="resume",
+            name="summary",
+            field=models.TextField(
+                help_text="Resumen o descripción general del usuario.", null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='resume',
-            name='template_selected',
-            field=models.ForeignKey(help_text='Plantilla seleccionada para la visualización del resumen.', null=True, on_delete=django.db.models.deletion.CASCADE, related_name='resumes', to='resume_app.template'),
+            model_name="resume",
+            name="template_selected",
+            field=models.ForeignKey(
+                help_text="Plantilla seleccionada para la visualización del resumen.",
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="resumes",
+                to="resume_app.template",
+            ),
         ),
         migrations.AlterField(
-            model_name='resume',
-            name='updated_at',
-            field=models.DateTimeField(auto_now=True, help_text='Fecha de última modificación del registro.'),
+            model_name="resume",
+            name="updated_at",
+            field=models.DateTimeField(
+                auto_now=True, help_text="Fecha de última modificación del registro."
+            ),
         ),
         migrations.AlterField(
-            model_name='resume',
-            name='user',
-            field=models.ForeignKey(help_text='Usuario dueño del resumen.', on_delete=django.db.models.deletion.CASCADE, related_name='resumes', to=settings.AUTH_USER_MODEL),
+            model_name="resume",
+            name="user",
+            field=models.ForeignKey(
+                help_text="Usuario dueño del resumen.",
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="resumes",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AlterField(
-            model_name='resumecustomization',
-            name='created_at',
-            field=models.DateTimeField(auto_now_add=True, help_text='Fecha de creación del registro.'),
+            model_name="resumecustomization",
+            name="created_at",
+            field=models.DateTimeField(
+                auto_now_add=True, help_text="Fecha de creación del registro."
+            ),
         ),
         migrations.AlterField(
-            model_name='resumecustomization',
-            name='custom_styles',
-            field=models.JSONField(default=list, help_text='Estilos personalizados aplicados al resumen.'),
+            model_name="resumecustomization",
+            name="custom_styles",
+            field=models.JSONField(
+                default=list, help_text="Estilos personalizados aplicados al resumen."
+            ),
         ),
         migrations.AlterField(
-            model_name='resumecustomization',
-            name='resume',
-            field=models.ForeignKey(help_text='Resumen al que se aplica la personalización.', on_delete=django.db.models.deletion.CASCADE, to='resume_app.resume'),
+            model_name="resumecustomization",
+            name="resume",
+            field=models.ForeignKey(
+                help_text="Resumen al que se aplica la personalización.",
+                on_delete=django.db.models.deletion.CASCADE,
+                to="resume_app.resume",
+            ),
         ),
         migrations.AlterField(
-            model_name='resumecustomization',
-            name='template',
-            field=models.ForeignKey(help_text='Plantilla seleccionada para la personalización.', on_delete=django.db.models.deletion.CASCADE, to='resume_app.template'),
+            model_name="resumecustomization",
+            name="template",
+            field=models.ForeignKey(
+                help_text="Plantilla seleccionada para la personalización.",
+                on_delete=django.db.models.deletion.CASCADE,
+                to="resume_app.template",
+            ),
         ),
         migrations.AlterField(
-            model_name='resumecustomization',
-            name='updated_at',
-            field=models.DateTimeField(auto_now=True, help_text='Fecha de última modificación del registro.'),
+            model_name="resumecustomization",
+            name="updated_at",
+            field=models.DateTimeField(
+                auto_now=True, help_text="Fecha de última modificación del registro."
+            ),
         ),
         migrations.AlterField(
-            model_name='skill',
-            name='created_at',
-            field=models.DateTimeField(auto_now_add=True, help_text='Fecha de creación del registro.'),
+            model_name="skill",
+            name="created_at",
+            field=models.DateTimeField(
+                auto_now_add=True, help_text="Fecha de creación del registro."
+            ),
         ),
         migrations.AlterField(
-            model_name='skill',
-            name='keywords',
-            field=models.JSONField(default=list, help_text='Palabras clave asociadas a la habilidad.', null=True),
+            model_name="skill",
+            name="keywords",
+            field=models.JSONField(
+                default=list,
+                help_text="Palabras clave asociadas a la habilidad.",
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='skill',
-            name='level',
-            field=models.CharField(default='Master', help_text='Nivel de la habilidad (Ej: Básico, Avanzado, Experto).', max_length=100, null=True),
+            model_name="skill",
+            name="level",
+            field=models.CharField(
+                default="Master",
+                help_text="Nivel de la habilidad (Ej: Básico, Avanzado, Experto).",
+                max_length=100,
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='skill',
-            name='name',
-            field=models.CharField(default='Web Development', help_text='Nombre de la habilidad.', max_length=100),
+            model_name="skill",
+            name="name",
+            field=models.CharField(
+                default="Web Development",
+                help_text="Nombre de la habilidad.",
+                max_length=100,
+            ),
         ),
         migrations.AlterField(
-            model_name='skill',
-            name='orden',
-            field=models.PositiveIntegerField(help_text='Orden en el que se mostrarán las habilidades en el resumen.'),
+            model_name="skill",
+            name="orden",
+            field=models.PositiveIntegerField(
+                help_text="Orden en el que se mostrarán las habilidades en el resumen."
+            ),
         ),
         migrations.AlterField(
-            model_name='skill',
-            name='resume',
-            field=models.ForeignKey(help_text='Resumen al que pertenece la habilidad.', on_delete=django.db.models.deletion.CASCADE, related_name='skills', to='resume_app.resume'),
+            model_name="skill",
+            name="resume",
+            field=models.ForeignKey(
+                help_text="Resumen al que pertenece la habilidad.",
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="skills",
+                to="resume_app.resume",
+            ),
         ),
         migrations.AlterField(
-            model_name='skill',
-            name='updated_at',
-            field=models.DateTimeField(auto_now=True, help_text='Fecha de última modificación del registro.'),
+            model_name="skill",
+            name="updated_at",
+            field=models.DateTimeField(
+                auto_now=True, help_text="Fecha de última modificación del registro."
+            ),
         ),
         migrations.AlterField(
-            model_name='template',
-            name='componet_name',
-            field=models.CharField(help_text='Nombre del componente web asociado a la plantilla.', max_length=100),
+            model_name="template",
+            name="componet_name",
+            field=models.CharField(
+                help_text="Nombre del componente web asociado a la plantilla.",
+                max_length=100,
+            ),
         ),
         migrations.AlterField(
-            model_name='template',
-            name='created_at',
-            field=models.DateTimeField(auto_now_add=True, help_text='Fecha de creación del registro.'),
+            model_name="template",
+            name="created_at",
+            field=models.DateTimeField(
+                auto_now_add=True, help_text="Fecha de creación del registro."
+            ),
         ),
         migrations.AlterField(
-            model_name='template',
-            name='customazation_rules',
-            field=models.JSONField(default=list, help_text='Reglas de personalización de la plantilla.'),
+            model_name="template",
+            name="customazation_rules",
+            field=models.JSONField(
+                default=list, help_text="Reglas de personalización de la plantilla."
+            ),
         ),
         migrations.AlterField(
-            model_name='template',
-            name='descripcion',
-            field=models.TextField(help_text='Descripción de la plantilla.', null=True),
+            model_name="template",
+            name="descripcion",
+            field=models.TextField(help_text="Descripción de la plantilla.", null=True),
         ),
         migrations.AlterField(
-            model_name='template',
-            name='name',
-            field=models.CharField(help_text='Nombre de la plantilla.', max_length=100),
+            model_name="template",
+            name="name",
+            field=models.CharField(help_text="Nombre de la plantilla.", max_length=100),
         ),
         migrations.AlterField(
-            model_name='template',
-            name='updated_at',
-            field=models.DateTimeField(auto_now=True, help_text='Fecha de última modificación del registro.'),
+            model_name="template",
+            name="updated_at",
+            field=models.DateTimeField(
+                auto_now=True, help_text="Fecha de última modificación del registro."
+            ),
         ),
         migrations.DeleteModel(
-            name='ResumeTemplate',
+            name="ResumeTemplate",
         ),
     ]

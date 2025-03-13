@@ -56,7 +56,7 @@ class TemplateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Template
-        fields = ["id", "name", "descripcion", "componet_name", "customazation_rules"]
+        fields = ["id", "name", "descripcion", "componet_name", "customization_rules"]
 
     def validate(self, attrs):
         logger.info(f"Validando datos de Template: {attrs}")

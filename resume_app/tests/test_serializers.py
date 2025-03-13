@@ -51,7 +51,7 @@ class ResumeSerializerTest(SerializerTestSetUp):
                 "name": self.template.name,
                 "descripcion": self.template.descripcion,
                 "componet_name": self.template.componet_name,
-                "customazation_rules": self.template.customazation_rules,
+                "customization_rules": self.template.customization_rules,
             },
             "skills": [],
             "experiences": [],
@@ -304,7 +304,7 @@ class TemplateSerializerTest(SerializerTestSetUp):
             "name": template.name,
             "descripcion": template.descripcion,
             "componet_name": template.componet_name,
-            "customazation_rules": template.customazation_rules,
+            "customization_rules": template.customization_rules,
         }
         self.assertEqual(serializer.data, expected_data)
 
@@ -316,7 +316,7 @@ class TemplateSerializerTest(SerializerTestSetUp):
             "name": "New Template",
             "descripcion": "Descripción de la nueva plantilla",
             "componet_name": "new-template",
-            "customazation_rules": [],
+            "customization_rules": [],
         }
         serializer = TemplateSerializer(data=data)
         self.assertTrue(serializer.is_valid())
@@ -324,7 +324,7 @@ class TemplateSerializerTest(SerializerTestSetUp):
         self.assertEqual(template.name, "New Template")
         self.assertEqual(template.descripcion, "Descripción de la nueva plantilla")
         self.assertEqual(template.componet_name, "new-template")
-        self.assertEqual(template.customazation_rules, [])
+        self.assertEqual(template.customization_rules, [])
 
     def test_template_serializer_update(self):
         """
@@ -335,7 +335,7 @@ class TemplateSerializerTest(SerializerTestSetUp):
             "name": "Updated Template",
             "descripcion": "Updated descripción",
             "componet_name": "updated-template",
-            "customazation_rules": ["rule1", "rule2"],
+            "customization_rules": ["rule1", "rule2"],
         }
         serializer = TemplateSerializer(template, data=data)
         self.assertTrue(serializer.is_valid())
@@ -344,4 +344,4 @@ class TemplateSerializerTest(SerializerTestSetUp):
         self.assertEqual(template.name, "Updated Template")
         self.assertEqual(template.descripcion, "Updated descripción")
         self.assertEqual(template.componet_name, "updated-template")
-        self.assertEqual(template.customazation_rules, ["rule1", "rule2"])
+        self.assertEqual(template.customization_rules, ["rule1", "rule2"])

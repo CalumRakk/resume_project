@@ -1,6 +1,29 @@
 from django.http import HttpRequest
 import ipaddress
 from rest_framework.exceptions import ValidationError
+import json
+from django.conf import settings
+
+SCHEMA_DIR = settings.BASE_DIR / "resume_app" / "schemas"
+
+
+class SchemaLoader:
+    """Singleton para cargar y almacenar los esquemas JSON en memoria."""
+
+    _schemas = {}
+
+    @classmethod
+    def load_schema(cls, filename: str):
+        """Carga un esquema solo si aún no está en memoria."""
+        if filename not in cls._schemas:
+            schema_path = SCHEMA_DIR / filename
+            try:
+                cls._schemas[filename] = json.load(schema_path.read_text("utf-8"))
+            except FileNotFoundError:
+                raise FileNotFoundError(f"Schema file '{filename}' not found.")
+            except json.JSONDecodeError as e:
+                raise ValueError(f"Error parsing JSON schema '{filename}': {e}")
+        return cls._schemas[filename]
 
 
 def check_list_does_not_exceed_50(value):

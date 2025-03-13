@@ -1,11 +1,12 @@
 # refresca la autenticación.
 # @name login
-POST {{host}}/{{version}}/refresh-token/
+POST {{host}}/{{version}}/login/
 Content-Type: application/json
 User-Agent: {{userAgent}}
 
 {
-    "refresh":"{{refreshToken}}"
+    "username": "admin",
+    "password": "admin"
 }
 
 

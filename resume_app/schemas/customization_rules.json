@@ -1,0 +1,60 @@
+{
+  "type": "object",
+  "properties": {
+    "color": {
+      "description": "Lista de colores permitidos o 'any' para admitir todos los colores definidos.",
+      "oneOf": [
+        {
+          "type": "array",
+          "description": "Lista de colores específicos.",
+          "items": {
+            "type": "string",
+            "enum": ["red", "blue", "green", "yellow", "black", "white"]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        {
+          "type": "string",
+          "description": "'any' indica que se permiten todos los colores de la lista.",
+          "const": "any"
+        }
+      ]
+    },
+    "margins": {
+      "type": "object",
+      "properties": {
+        "min": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 64
+        },
+        "max": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 64
+        }
+      },
+      "required": ["min", "max"],
+      "description": "Valores mínimos y máximos para márgenes."
+    },
+    "font_size": {
+      "type": "object",
+      "properties": {
+        "min": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 64
+        },
+        "max": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 64
+        }
+      },
+      "required": ["min", "max"],
+      "description": "Valores mínimos y máximos para el tamaño de fuente."
+    }
+  },
+  "required": ["color", "margins"]
+}

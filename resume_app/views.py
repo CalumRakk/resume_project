@@ -75,7 +75,6 @@ class ResumeDetailUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     get=extend_schema(
         summary="Listar todos los resumes",
         description="Retorna una lista todos los resumes del usuario.",
-        responses={200: ResumeSerializer(many=True)},
     ),
     post=extend_schema(
         summary="Crear un nuevo resume",
@@ -99,7 +98,6 @@ class ResumeDetailUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
                             "name": "Desarrollador Web",
                             "position": "Full Stack Developer",
                             "url": "https://company.com",
-                            "highlights": [],
                             "summary": "Parte del equipo de desarrollo.",
                         }
                     ],

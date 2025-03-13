@@ -89,7 +89,7 @@ A continuación, verás las URLs disponibles, recuerda que todas están dentro d
         "name": "Modern",
         "descripcion": "Plantilla moderna...",
         "componet_name": "modern-resume",
-        "customazation_rules": []
+        "customization_rules": []
       },
       "skills": [...],
       "experiences": [...],

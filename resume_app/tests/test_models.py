@@ -256,13 +256,13 @@ class TemplateModelTest(TestCase):
         self.assertIsNotNone(template.created_at)
         self.assertIsNotNone(template.updated_at)
 
-    def test_template_customazation_rules_default(self):
+    def test_template_customization_rules_default(self):
         """
-        Verifica que el campo 'customazation_rules' tenga el valor por defecto (lista vacía).
+        Verifica que el campo 'customization_rules' tenga el valor por defecto (lista vacía).
         """
         template = Template.objects.create(
             name="Modern",
             descripcion="Plantilla moderna",
             componet_name="modern-resume",
         )
-        self.assertEqual(template.customazation_rules, [])
+        self.assertEqual(template.customization_rules, [])

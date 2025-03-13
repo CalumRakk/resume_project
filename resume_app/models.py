@@ -187,7 +187,7 @@ class Template(BaseModel):
     componet_name = models.CharField(
         max_length=100, help_text="Nombre del componente web asociado a la plantilla."
     )
-    customazation_rules = models.JSONField(
+    customization_rules = models.JSONField(
         default=list, help_text="Reglas de personalización de la plantilla."
     )
     descripcion = models.TextField(
