@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
-from drf_spectacular.utils import extend_schema, OpenApiExample
+from drf_spectacular.utils import extend_schema, OpenApiExample, extend_schema_view
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse, Http404
 from django.views import View
@@ -24,6 +24,37 @@ logger = logging.getLogger(__name__)
 
 
 @extend_schema(tags=["Resumes"])
+@extend_schema_view(
+    get=extend_schema(summary="Obtener un resume", responses={200: ResumeSerializer}),
+    put=extend_schema(summary="Actualizar un resume", request=ResumeSerializer),
+    patch=extend_schema(
+        summary="Actualización parcial",
+        request=ResumeSerializer,
+        responses={200: ResumeSerializer},
+        examples=[
+            OpenApiExample(
+                "Actualización parcial del resumen.",
+                summary="Ejemplo de datos parciales",
+                value={
+                    "name": "nuevo nombre",
+                    "summary": "nuevo summary",
+                    "skills": [
+                        {
+                            "id": 1,
+                            "name": "actualiza el skill",
+                            "level": "Master",
+                            "keywords": ["HTML", "CSS", "JavaScript"],
+                        }
+                    ],
+                },
+                request_only=True,
+            )
+        ],
+    ),
+    delete=extend_schema(
+        summary="Eliminar un resume",
+    ),
+)
 class ResumeDetailUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ResumeSerializer
     lookup_field = "id"
@@ -38,128 +69,15 @@ class ResumeDetailUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
         obj.customization = next(iter(obj.customization_list), None)
         return obj
 
-    @extend_schema(
-        summary="Obtener un resume",
-        description="Retorna un resume del usuario.",
-        responses={200: ResumeSerializer},
-    )
-    def get(self, request, *args, **kwargs):
-        logger.info(
-            f"Intentando obtener el resume con ID: {kwargs.get('id')} para el usuario: {request.user}"
-        )
-        try:
-            response = super().get(request, *args, **kwargs)
-            logger.info(f"Resume obtenido exitosamente: {kwargs.get('id')}")
-            return response
-        except Exception as e:
-            logger.error(f"Error al obtener el resume: {str(e)}")
-            raise
-
-    @extend_schema(
-        summary="Actualizacion de reemplazo del resume",
-        description="Actualización de reemplazo de un Resumen. Actualiza los campos proporcionados del resume, y los elementos de los campos relacionados ( como skills, experience) serán creados, actualizados o eliminados según estén proporcionados en la solicitud. Retorna el objeto completo actualizado.",
-        request=ResumeSerializer,
-        responses={200: ResumeSerializer},
-    )
-    def put(self, request, *args, **kwargs):
-        logger.info(
-            f"Intentando reemplazar el resume con ID: {kwargs.get('id')} para el usuario: {request.user}"
-        )
-        try:
-            response = super().put(request, *args, **kwargs)
-            logger.info(f"Resume actualizado exitosamente: {kwargs.get('id')}")
-            return response
-        except Exception as e:
-            logger.error(f"Error al actualizar el resume: {str(e)}")
-            raise
-
-    @extend_schema(
-        summary="Eliminar el resumen",
-        description="Elimina el resumen especificado en la url.",
-        responses={204: None},
-    )
-    def delete(self, request, *args, **kwargs):
-        logger.info(
-            f"Intentando eliminar el resume con ID: {kwargs.get('id')} para el usuario: {request.user}"
-        )
-        try:
-            response = super().delete(request, *args, **kwargs)
-            logger.info(f"Resume eliminado exitosamente: {kwargs.get('id')}")
-            return response
-        except Exception as e:
-            logger.error(f"Error al eliminar el resume: {str(e)}")
-            raise
-
-    @extend_schema(
-        summary="Actualización parcial del resumen",
-        description="Actualización parcial del resumen. Sólo se actualizan los campos proporcionados y recibe como respuesta el objeto completo actualizado.",
-        request=ResumeSerializer,
-        responses={200: ResumeSerializer},
-        examples=[
-            OpenApiExample(
-                "Actualización parcial del resumen.",
-                summary="Ejemplo de datos parciales",
-                value={
-                    "name": "nuevo nombre",
-                    "summary": "nuevo summary",
-                    "skills": [
-                        {
-                            "id": 1,
-                            "name": "actualiza el skill",
-                            "level": "Avanzado",
-                        },
-                        {"name": "crea un nuevo skill", "level": "Experto"},
-                    ],
-                },
-                request_only=True,
-            ),
-        ],
-    )
-    def patch(self, request, *args, **kwargs):
-        logger.info(
-            f"Intentando actualizar el template para el resume: {kwargs.get('id')}"
-        )
-        try:
-            response = super().patch(request, *args, **kwargs)
-            logger.info(
-                f"Template actualizado exitosamente para el resume: {kwargs.get('id')}"
-            )
-            return response
-        except Exception as e:
-            logger.error(f"Error al actualizar el template: {str(e)}")
-            raise
-
 
 @extend_schema(tags=["Resumes"])
-class ResumeListCreateView(generics.ListCreateAPIView):
-    serializer_class = ResumeSerializer
-
-    def get_queryset(self):
-        # Solo retorna los currículos del usuario.
-        return Resume.get_with_customization(self.request.user)
-
-    def perform_create(self, serializer):
-        # Asigna automáticamente el usuario al crear un resume
-        serializer.save(user=self.request.user)
-
-    @extend_schema(
+@extend_schema_view(
+    get=extend_schema(
         summary="Listar todos los resumes",
         description="Retorna una lista todos los resumes del usuario.",
         responses={200: ResumeSerializer(many=True)},
-    )
-    def get(self, request, *args, **kwargs):
-        logger.info(f"Listando resumes para el usuario: {request.user}")
-        try:
-            response = super().get(request, *args, **kwargs)
-            logger.info(
-                f"Resumes listados exitosamente para el usuario: {request.user}"
-            )
-            return response
-        except Exception as e:
-            logger.error(f"Error al listar resumes: {str(e)}")
-            raise
-
-    @extend_schema(
+    ),
+    post=extend_schema(
         summary="Crear un nuevo resume",
         description="Crea un nuevo resume con los datos proporcionados y devuelve el objeto creado.",
         request=ResumeSerializer,
@@ -183,56 +101,38 @@ class ResumeListCreateView(generics.ListCreateAPIView):
                             "url": "https://company.com",
                             "highlights": [],
                             "summary": "Parte del equipo de desarrollo.",
-                            "start_date": "2025-01-10",
-                            "end_date": "2025-01-10",
                         }
                     ],
                     "full_name": "Leonardo",
-                    "email": "mi_email@gmail.com",
-                    "summary": "Apasionado del desarrollo web y estudiante un curso de desarrollador web.",
-                    "template_selected": 2,
-                    "customization": {
-                        "styles": {
-                            "font": "Arial",
-                            "color_scheme": "dark",
-                            "margin": "10px",
-                        },
-                    },
+                    "email": "3X6Tt@example.com",
+                    "summary": "Desarrollador web con experiencia...",
+                    "template_selected": 1,
                 },
                 request_only=True,
             )
         ],
-    )
-    def post(self, request, *args, **kwargs):
-        logger.info(f"Intentando crear un nuevo resume para el usuario: {request.user}")
-        try:
-            response = super().post(request, *args, **kwargs)
-            logger.info(f"Resume creado exitosamente con ID: {response.data.get('id')}")
-            return response
-        except Exception as e:
-            logger.error(f"Error al crear el resume: {str(e)}")
-            raise
+    ),
+)
+class ResumeListCreateView(generics.ListCreateAPIView):
+    serializer_class = ResumeSerializer
+
+    def get_queryset(self):
+        # Solo retorna los currículos del usuario.
+        return Resume.get_with_customization(self.request.user)
+
+    def perform_create(self, serializer):
+        # Asigna automáticamente el usuario al crear un resume
+        serializer.save(user=self.request.user)
 
 
 @extend_schema(tags=["Templates"])
-class TemplateListResumeTemplateUpdateView(APIView):
-    @extend_schema(
+@extend_schema_view(
+    get=extend_schema(
         summary="Listar todos los templates",
         description="Retorna una lista todos los templates.",
         responses={200: TemplateSerializer(many=True)},
-    )
-    def get(self, request, *args, **kwargs):
-        logger.info("Listando todos los templates")
-        try:
-            templates = Template.objects.all()
-            serializer = TemplateSerializer(templates, many=True)
-            logger.info("Templates listados exitosamente")
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except Exception as e:
-            logger.error(f"Error al listar templates: {str(e)}")
-            raise
-
-    @extend_schema(
+    ),
+    patch=extend_schema(
         summary="Actualizar un template",
         description="Actualiza el template de un resumen especifico del usuario.",
         request=ResumeSerializer,
@@ -249,7 +149,20 @@ class TemplateListResumeTemplateUpdateView(APIView):
                 request_only=True,
             )
         ],
-    )
+    ),
+)
+class TemplateListResumeTemplateUpdateView(APIView):
+    def get(self, request, *args, **kwargs):
+        logger.info("Listando todos los templates")
+        try:
+            templates = Template.objects.all()
+            serializer = TemplateSerializer(templates, many=True)
+            logger.info("Templates listados exitosamente")
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Error al listar templates: {str(e)}")
+            raise
+
     def patch(self, request, *args, **kwargs):
         logger.info(
             f"Intentando actualizar el template para el resume: {request.data.get('resume_id')}"
