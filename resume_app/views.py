@@ -16,7 +16,7 @@ from django.shortcuts import render
 
 from .models import Resume, Template, ResumeCustomization
 from .serializers import ResumeSerializer, TemplateSerializer
-from .utils import get_client_ip, is_ip_in_range
+from .utils import get_client_ip, is_ip_in_range, SchemaLoader
 
 
 # Configuración del logger
@@ -123,6 +123,34 @@ class ResumeListCreateView(generics.ListCreateAPIView):
         serializer.save(user=self.request.user)
 
 
+# @extend_schema(tags=["Templates"])
+# @extend_schema_view(
+#     get=extend_schema(
+#         summary="Listar todos los templates",
+#         description="Retorna una lista todos los templates.",
+#         responses={200: TemplateSerializer(many=True)},
+#     ),
+#     # patch=extend_schema(
+#     #     summary="Actualizar un template",
+#     #     description="Actualiza el template de un resumen especifico del usuario.",
+#     #     request=ResumeSerializer,
+#     #     responses={200: ResumeSerializer},
+#     #     examples=[
+#     #         OpenApiExample(
+#     #             "Ejemplo de actualización de template",
+#     #             summary="Ejemplo de datos correctos",
+#     #             description="Este es un ejemplo de cómo debería verse una solicitud exitosa.",
+#     #             value={
+#     #                 "resume_id": 1,
+#     #                 "template_selected": 2,
+#     #             },
+#     #             request_only=True,
+#     #         )
+#     #     ],
+#     # ),
+# )
+
+
 @extend_schema(tags=["Templates"])
 @extend_schema_view(
     get=extend_schema(
@@ -130,24 +158,35 @@ class ResumeListCreateView(generics.ListCreateAPIView):
         description="Retorna una lista todos los templates.",
         responses={200: TemplateSerializer(many=True)},
     ),
-    # patch=extend_schema(
-    #     summary="Actualizar un template",
-    #     description="Actualiza el template de un resumen especifico del usuario.",
-    #     request=ResumeSerializer,
-    #     responses={200: ResumeSerializer},
-    #     examples=[
-    #         OpenApiExample(
-    #             "Ejemplo de actualización de template",
-    #             summary="Ejemplo de datos correctos",
-    #             description="Este es un ejemplo de cómo debería verse una solicitud exitosa.",
-    #             value={
-    #                 "resume_id": 1,
-    #                 "template_selected": 2,
-    #             },
-    #             request_only=True,
-    #         )
-    #     ],
-    # ),
+    post=extend_schema(
+        summary="Crear un nuevo template",
+        description="Crea un nuevo template con los datos proporcionados y devuelve el objeto creado.",
+        request=TemplateSerializer,
+        responses={200: TemplateSerializer},
+        examples=[
+            OpenApiExample(
+                "Ejemplo de creación de template",
+                description="Ejemplo de datos para crear un template",
+                value={
+                    "name": "Nuevo Template",
+                    "componet_name": "mi-componente",
+                    "customization_rules": {
+                        "color": ["red", "blue", "green"],
+                        "margins": {"min": 0, "max": 64},
+                        "font_size": {"min": 0, "max": 64},
+                    },
+                    "descripcion": "Descripción del template",
+                },
+                request_only=True,
+            ),
+            OpenApiExample(
+                "Schema de reglas de personalización",
+                value=SchemaLoader.load_schema("customization_rules.json"),
+                description="Esquema de reglas de personalización que se utiliza para validar los datos de personalización especificados en el campo ´customization_rules´.",
+                request_only=True,
+            ),
+        ],
+    ),
 )
 class TemplateListCreateView(generics.ListCreateAPIView):
     serializer_class = TemplateSerializer
