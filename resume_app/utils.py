@@ -31,14 +31,13 @@ class SchemaLoader:
 def is_valid_webcomponent(name):
     if bool(webcomponent_regex.fullmatch(name)) is False:
         raise ValidationError(
-            "El nombre del componente no es válido. Debe estar en minúsculas, contener al menos un guion (`-`), "
-            "y no debe comenzar ni terminar con un número o un guion."
-            '"app-component" ✅ Válido.'
-            '"app-name-component" ✅ Válido.'
-            '"component-123" ❌ Inválido.'
-            '"component123" ❌ Inválido.'
-            '"App-Component" ❌ Inválido.'
-            '"singleword" ❌ Inválido.'
+            f"El nombre del componente {name} no es válido. Debe estar en minúsculas, contener al menos un guion (`-`), "
+            "y no debe comenzar ni terminar con un número o un guion. "
+            "app-component ✅ Válido. "
+            "app-name-component ✅ Válido. "
+            "component123 ❌ Inválido. "
+            "App-Component ❌ Inválido. "
+            "singleword ❌ Inválido."
         )
     return True
 

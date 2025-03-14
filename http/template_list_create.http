@@ -27,7 +27,7 @@ Authorization: Bearer {{login.response.body.access}}
 {
   "name": "template nuevo",
   "descripcion": "El siguiente template es un nuevo estilo moderno",
-  "componet_name": "template_moderno_02",
+  "componet_name": "component-moderno",
   "customization_rules": {"color":["yellow", "black", "white"],"margins":{"min":1,"max":24}, "font_size":{"min":1,"max":24}}
 }
 
