@@ -22,6 +22,7 @@ class SerializerTestSetUp(TestCase):
             name="Modern",
             descripcion="Plantilla moderna",
             componet_name="modern-resume",
+            user=self.user
         )
         self.resume = Resume.objects.create(
             full_name="John Doe",

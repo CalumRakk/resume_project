@@ -22,6 +22,7 @@ class ResumeModelTest(TestCase):
             name="Modern",
             descripcion="Plantilla moderna",
             componet_name="modern-resume",
+            user=self.user,
         )
 
     def test_resume_creation(self):
@@ -241,6 +242,15 @@ class TemplateModelTest(TestCase):
     Pruebas para el modelo Template.
     """
 
+    def setUp(self):
+        """
+        Configuración inicial para las pruebas del modelo Template.
+        Crea un usuario para ser utilizado en las pruebas.
+        """
+        self.user = User.objects.create_user(
+            username="testuser", password="testpassword"
+        )
+
     def test_template_creation(self):
         """
         Verifica la creación exitosa de un objeto Template con todos los campos obligatorios.
@@ -249,6 +259,7 @@ class TemplateModelTest(TestCase):
             name="Modern",
             descripcion="Plantilla moderna",
             componet_name="modern-resume",
+            user=self.user,
         )
         self.assertEqual(template.name, "Modern")
         self.assertEqual(template.descripcion, "Plantilla moderna")
@@ -264,5 +275,6 @@ class TemplateModelTest(TestCase):
             name="Modern",
             descripcion="Plantilla moderna",
             componet_name="modern-resume",
+            user=self.user,
         )
         self.assertEqual(template.customization_rules, {})
