@@ -171,6 +171,9 @@ class TemplateListCreateView(generics.ListCreateAPIView):
             return [permissions.IsAdminUser()]
         return [permissions.AllowAny()]
 
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
     # def patch(self, request, *args, **kwargs):
     #     logger.info(
     #         f"Intentando actualizar el template para el resume: {request.data.get('resume_id')}"

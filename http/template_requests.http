@@ -27,7 +27,7 @@ Authorization: Bearer {{login.response.body.access}}
 
 
 ###
-### CREAR UN RESUME
+### CREAR UN TEMPLATE
 POST  {{host}}/{{version}}/templates/
 Content-Type: application/json
 User-Agent: {{userAgent}}
@@ -71,7 +71,7 @@ Authorization: Bearer {{login.response.body.access}}
 
 ###
 ### ELIMINA UN TEMPLATE
-DELETE  {{host}}/{{version}}/templates/5/
+DELETE  {{host}}/{{version}}/templates/16/
 Content-Type: application/json
 User-Agent: {{userAgent}}
 Authorization: Bearer {{login.response.body.access}}

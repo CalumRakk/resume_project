@@ -150,6 +150,7 @@ class ResumeSerializer(serializers.ModelSerializer):
         """
         logger.info(f"Iniciando transacción para crear nuevo Resume")
         try:
+            # TODOS: La operacion de creacion debe ser optimizada, para evitar tener de usar tantas veces el método Model.create
             # Extraer datos de relaciones
             skills_data = validated_data.pop("skills", [])
             experiences_data = validated_data.pop("experiences", [])

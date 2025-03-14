@@ -195,6 +195,12 @@ class Template(BaseModel):
     descripcion = models.TextField(
         null=True, help_text="Descripción de la plantilla.", max_length=500
     )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="templates",
+        help_text="Usuario creador del template.",
+    )
 
     class Meta:
         verbose_name = "Plantilla"
