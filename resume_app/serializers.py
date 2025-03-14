@@ -81,15 +81,6 @@ class TemplateSerializer(serializers.ModelSerializer):
             )
         return value
 
-    # def update(self, instance, validated_data):
-    #     logger.info("Actualizando Template")
-    #     for key, value in validated_data.items():
-    #         setattr(instance, key, value)
-    #     instance.save()
-
-    #     logger.info("Template actualizado exitosamente")
-    #     return instance
-
 
 class ResumeSerializer(serializers.ModelSerializer):
     """

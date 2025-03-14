@@ -26,9 +26,11 @@ logger = logging.getLogger(__name__)
 @extend_schema(tags=["Resumes"])
 @extend_schema_view(
     get=extend_schema(summary="Obtener un resume", responses={200: ResumeSerializer}),
-    put=extend_schema(summary="Actualizar un resume", request=ResumeSerializer),
+    put=extend_schema(
+        summary="Actualizacion de reemplazo del resume", request=ResumeSerializer
+    ),
     patch=extend_schema(
-        summary="Actualización parcial",
+        summary="Actualización parcial del resume",
         request=ResumeSerializer,
         responses={200: ResumeSerializer},
         examples=[
@@ -201,6 +203,25 @@ class TemplateListCreateView(generics.ListCreateAPIView):
     #         raise
 
 
+@extend_schema(tags=["Templates"])
+@extend_schema_view(
+    get=extend_schema(
+        summary="Obtener un template",
+        description="Retorna un template con el id proporcionado.",
+    ),
+    put=extend_schema(
+        summary="Actualización de reemplazo del template",
+        request=TemplateSerializer,
+    ),
+    patch=extend_schema(
+        summary="Actualización de reemplazo del template",
+        request=TemplateSerializer,
+    ),
+    delete=extend_schema(
+        summary="Eliminación del template",
+        description="Elimina el template con el id proporcionado.",
+    ),
+)
 class TemplateDetailUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = TemplateSerializer
     queryset = Template.objects.all()
