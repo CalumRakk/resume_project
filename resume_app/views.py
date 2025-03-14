@@ -1,7 +1,7 @@
 import logging
 from pathlib import Path
 from django.conf import settings
-from rest_framework import generics, status
+from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenRefreshView
@@ -149,9 +149,14 @@ class ResumeListCreateView(generics.ListCreateAPIView):
     #     ],
     # ),
 )
-class TemplateListResumeTemplateUpdateView(generics.ListCreateAPIView):
+class TemplateListCreateView(generics.ListCreateAPIView):
     serializer_class = TemplateSerializer
     queryset = Template.objects.all()
+
+    def get_permissions(self):
+        if self.request.method == "POST":
+            return [permissions.IsAdminUser()]
+        return [permissions.AllowAny()]
 
     # def patch(self, request, *args, **kwargs):
     #     logger.info(

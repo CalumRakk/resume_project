@@ -22,7 +22,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from resume_app.views import (
     ResumeDetailUpdateDestroyView,
     ResumeListCreateView,
-    TemplateListResumeTemplateUpdateView,
+    TemplateListCreateView,
     CustomTokenRefreshView,
     LogView,
 )
@@ -48,7 +48,7 @@ urlpatterns = [
                 ),
                 path(
                     "templates/",
-                    TemplateListResumeTemplateUpdateView.as_view(),
+                    TemplateListCreateView.as_view(),
                     name="template-list-resume-template-update",
                 ),
                 path("login/", TokenObtainPairView.as_view(), name="login"),
