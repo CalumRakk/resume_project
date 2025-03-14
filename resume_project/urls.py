@@ -23,6 +23,7 @@ from resume_app.views import (
     ResumeDetailUpdateDestroyView,
     ResumeListCreateView,
     TemplateListCreateView,
+    TemplateDetailUpdateDestroyView,
     CustomTokenRefreshView,
     LogView,
 )
@@ -50,6 +51,11 @@ urlpatterns = [
                     "templates/",
                     TemplateListCreateView.as_view(),
                     name="template-list-resume-template-update",
+                ),
+                path(
+                    "templates/<int:pk>/",
+                    TemplateDetailUpdateDestroyView.as_view(),
+                    name="template-detail-update-destroy",
                 ),
                 path("login/", TokenObtainPairView.as_view(), name="login"),
                 path(

@@ -123,34 +123,6 @@ class ResumeListCreateView(generics.ListCreateAPIView):
         serializer.save(user=self.request.user)
 
 
-# @extend_schema(tags=["Templates"])
-# @extend_schema_view(
-#     get=extend_schema(
-#         summary="Listar todos los templates",
-#         description="Retorna una lista todos los templates.",
-#         responses={200: TemplateSerializer(many=True)},
-#     ),
-#     # patch=extend_schema(
-#     #     summary="Actualizar un template",
-#     #     description="Actualiza el template de un resumen especifico del usuario.",
-#     #     request=ResumeSerializer,
-#     #     responses={200: ResumeSerializer},
-#     #     examples=[
-#     #         OpenApiExample(
-#     #             "Ejemplo de actualización de template",
-#     #             summary="Ejemplo de datos correctos",
-#     #             description="Este es un ejemplo de cómo debería verse una solicitud exitosa.",
-#     #             value={
-#     #                 "resume_id": 1,
-#     #                 "template_selected": 2,
-#     #             },
-#     #             request_only=True,
-#     #         )
-#     #     ],
-#     # ),
-# )
-
-
 @extend_schema(tags=["Templates"])
 @extend_schema_view(
     get=extend_schema(
@@ -227,6 +199,16 @@ class TemplateListCreateView(generics.ListCreateAPIView):
     #     except Exception as e:
     #         logger.error(f"Error al actualizar el template: {str(e)}")
     #         raise
+
+
+class TemplateDetailUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = TemplateSerializer
+    queryset = Template.objects.all()
+
+    def get_permissions(self):
+        if self.request.method != "GET":
+            return [permissions.IsAdminUser()]
+        return [permissions.AllowAny()]
 
 
 class CustomTokenRefreshView(TokenRefreshView):

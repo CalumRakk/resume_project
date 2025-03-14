@@ -53,6 +53,16 @@ class ExperienceSerializer(serializers.ModelSerializer):
         return value
 
 
+class ResumeCustomizationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ResumeCustomization
+        fields = ["id", "custom_styles"]
+        extra_kwargs = {
+            "resume": {"required": False},
+            "template": {"required": False},
+        }
+
+
 class TemplateSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
 
@@ -71,15 +81,14 @@ class TemplateSerializer(serializers.ModelSerializer):
             )
         return value
 
+    # def update(self, instance, validated_data):
+    #     logger.info("Actualizando Template")
+    #     for key, value in validated_data.items():
+    #         setattr(instance, key, value)
+    #     instance.save()
 
-class ResumeCustomizationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ResumeCustomization
-        fields = ["id", "custom_styles"]
-        extra_kwargs = {
-            "resume": {"required": False},
-            "template": {"required": False},
-        }
+    #     logger.info("Template actualizado exitosamente")
+    #     return instance
 
 
 class ResumeSerializer(serializers.ModelSerializer):
