@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from resume_app.utils import check_list_does_not_exceed_50
+from resume_app.utils import check_list_does_not_exceed_50, is_valid_webcomponent
 from django.db.models import Prefetch, F
 
 
@@ -185,10 +185,12 @@ class Template(BaseModel):
 
     name = models.CharField(max_length=100, help_text="Nombre de la plantilla.")
     componet_name = models.CharField(
-        max_length=100, help_text="Nombre del componente web asociado a la plantilla."
+        max_length=100,
+        help_text="Nombre del componente web asociado a la plantilla.",
+        validators=[is_valid_webcomponent],
     )
     customization_rules = models.JSONField(
-        default=list, help_text="Reglas de personalización de la plantilla."
+        default=dict, help_text="Reglas de personalización de la plantilla."
     )
     descripcion = models.TextField(
         null=True, help_text="Descripción de la plantilla.", max_length=500
@@ -215,7 +217,7 @@ class ResumeCustomization(BaseModel):
         help_text="Plantilla seleccionada para la personalización.",
     )
     custom_styles = models.JSONField(
-        default=list, help_text="Estilos personalizados aplicados al resumen."
+        default=dict, help_text="Estilos personalizados aplicados al resumen."
     )
 
     class Meta:

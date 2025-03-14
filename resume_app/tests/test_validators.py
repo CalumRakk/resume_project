@@ -1,6 +1,6 @@
 from rest_framework.exceptions import ValidationError
 from django.test import TestCase
-from resume_app.utils import check_list_does_not_exceed_50
+from resume_app.utils import check_list_does_not_exceed_50, is_valid_webcomponent
 
 
 class ValidateListTestCase(TestCase):
@@ -27,3 +27,17 @@ class ValidateListTestCase(TestCase):
 
         with self.assertRaises(ValidationError):
             check_list_does_not_exceed_50({"key": "value"})
+
+    def test_is_valid_webcomponent(self):
+
+        self.assertTrue(is_valid_webcomponent("app-component"))
+        self.assertTrue(is_valid_webcomponent("app-name-component"))
+
+        with self.assertRaises(ValidationError):
+            is_valid_webcomponent("component-123")
+        with self.assertRaises(ValidationError):
+            is_valid_webcomponent("123-component")
+        with self.assertRaises(ValidationError):
+            is_valid_webcomponent("App-Component")
+        with self.assertRaises(ValidationError):
+            is_valid_webcomponent("singleword")

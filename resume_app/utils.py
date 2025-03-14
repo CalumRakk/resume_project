@@ -3,7 +3,9 @@ import ipaddress
 from rest_framework.exceptions import ValidationError
 import json
 from django.conf import settings
+import re
 
+webcomponent_regex = re.compile(r"^[a-z]+-[a-z]+(?:-[a-z]+)*$")
 SCHEMA_DIR = settings.BASE_DIR / "resume_app" / "schemas"
 
 
@@ -18,12 +20,27 @@ class SchemaLoader:
         if filename not in cls._schemas:
             schema_path = SCHEMA_DIR / filename
             try:
-                cls._schemas[filename] = json.load(schema_path.read_text("utf-8"))
+                cls._schemas[filename] = json.loads(schema_path.read_text("utf-8"))
             except FileNotFoundError:
                 raise FileNotFoundError(f"Schema file '{filename}' not found.")
             except json.JSONDecodeError as e:
                 raise ValueError(f"Error parsing JSON schema '{filename}': {e}")
         return cls._schemas[filename]
+
+
+def is_valid_webcomponent(name):
+    if bool(webcomponent_regex.fullmatch(name)) is False:
+        raise ValidationError(
+            "El nombre del componente no es válido. Debe estar en minúsculas, contener al menos un guion (`-`), "
+            "y no debe comenzar ni terminar con un número o un guion."
+            '"app-component" ✅ Válido.'
+            '"app-name-component" ✅ Válido.'
+            '"component-123" ❌ Inválido.'
+            '"component123" ❌ Inválido.'
+            '"App-Component" ❌ Inválido.'
+            '"singleword" ❌ Inválido.'
+        )
+    return True
 
 
 def check_list_does_not_exceed_50(value):

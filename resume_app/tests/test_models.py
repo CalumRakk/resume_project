@@ -265,4 +265,4 @@ class TemplateModelTest(TestCase):
             descripcion="Plantilla moderna",
             componet_name="modern-resume",
         )
-        self.assertEqual(template.customization_rules, [])
+        self.assertEqual(template.customization_rules, {})

@@ -56,5 +56,5 @@
       "description": "Valores mínimos y máximos para el tamaño de fuente."
     }
   },
-  "required": ["color", "margins"]
+  "required": ["color", "margins", "font_size"]
 }

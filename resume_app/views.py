@@ -130,67 +130,59 @@ class ResumeListCreateView(generics.ListCreateAPIView):
         description="Retorna una lista todos los templates.",
         responses={200: TemplateSerializer(many=True)},
     ),
-    patch=extend_schema(
-        summary="Actualizar un template",
-        description="Actualiza el template de un resumen especifico del usuario.",
-        request=ResumeSerializer,
-        responses={200: ResumeSerializer},
-        examples=[
-            OpenApiExample(
-                "Ejemplo de actualización de template",
-                summary="Ejemplo de datos correctos",
-                description="Este es un ejemplo de cómo debería verse una solicitud exitosa.",
-                value={
-                    "resume_id": 1,
-                    "template_selected": 2,
-                },
-                request_only=True,
-            )
-        ],
-    ),
+    # patch=extend_schema(
+    #     summary="Actualizar un template",
+    #     description="Actualiza el template de un resumen especifico del usuario.",
+    #     request=ResumeSerializer,
+    #     responses={200: ResumeSerializer},
+    #     examples=[
+    #         OpenApiExample(
+    #             "Ejemplo de actualización de template",
+    #             summary="Ejemplo de datos correctos",
+    #             description="Este es un ejemplo de cómo debería verse una solicitud exitosa.",
+    #             value={
+    #                 "resume_id": 1,
+    #                 "template_selected": 2,
+    #             },
+    #             request_only=True,
+    #         )
+    #     ],
+    # ),
 )
-class TemplateListResumeTemplateUpdateView(APIView):
-    def get(self, request, *args, **kwargs):
-        logger.info("Listando todos los templates")
-        try:
-            templates = Template.objects.all()
-            serializer = TemplateSerializer(templates, many=True)
-            logger.info("Templates listados exitosamente")
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except Exception as e:
-            logger.error(f"Error al listar templates: {str(e)}")
-            raise
+class TemplateListResumeTemplateUpdateView(generics.ListCreateAPIView):
+    serializer_class = TemplateSerializer
+    queryset = Template.objects.all()
 
-    def patch(self, request, *args, **kwargs):
-        logger.info(
-            f"Intentando actualizar el template para el resume: {request.data.get('resume_id')}"
-        )
-        try:
-            resume_id = request.data.get("resume_id")
-            template_selected = request.data.get("template_selected")
+    # def patch(self, request, *args, **kwargs):
+    #     logger.info(
+    #         f"Intentando actualizar el template para el resume: {request.data.get('resume_id')}"
+    #     )
+    #     try:
+    #         resume_id = request.data.get("resume_id")
+    #         template_selected = request.data.get("template_selected")
 
-            if not resume_id or not template_selected:
-                logger.warning("Faltan resume_id o template_selected en la solicitud")
-                return Response(
-                    {"error": "resume_id y template_selected son requeridos"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+    #         if not resume_id or not template_selected:
+    #             logger.warning("Faltan resume_id o template_selected en la solicitud")
+    #             return Response(
+    #                 {"error": "resume_id y template_selected son requeridos"},
+    #                 status=status.HTTP_400_BAD_REQUEST,
+    #             )
 
-            resume = get_object_or_404(Resume, id=resume_id, user=request.user)
-            template = get_object_or_404(Template, id=template_selected)
+    #         resume = get_object_or_404(Resume, id=resume_id, user=request.user)
+    #         template = get_object_or_404(Template, id=template_selected)
 
-            resume.template_selected = template
-            resume.save()
-            logger.info(
-                f"Template actualizado exitosamente para el resume: {resume_id}"
-            )
-            return Response(
-                {"success": "Resume updated successfully"},
-                status=status.HTTP_200_OK,
-            )
-        except Exception as e:
-            logger.error(f"Error al actualizar el template: {str(e)}")
-            raise
+    #         resume.template_selected = template
+    #         resume.save()
+    #         logger.info(
+    #             f"Template actualizado exitosamente para el resume: {resume_id}"
+    #         )
+    #         return Response(
+    #             {"success": "Resume updated successfully"},
+    #             status=status.HTTP_200_OK,
+    #         )
+    #     except Exception as e:
+    #         logger.error(f"Error al actualizar el template: {str(e)}")
+    #         raise
 
 
 class CustomTokenRefreshView(TokenRefreshView):

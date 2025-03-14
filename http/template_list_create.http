@@ -1,0 +1,34 @@
+
+# LOGIN NECESARIO PARA USAR LOS REQUEST
+# @name login
+POST {{host}}/{{version}}/login/
+Content-Type: application/json
+User-Agent: {{userAgent}}
+
+{
+    "username": "admin",
+    "password": "admin"
+}
+
+### ENLISTA TODOS LOS TEMPLATES DISPONIBLES
+
+GET {{host}}/{{version}}/templates/
+Content-Type: application/json
+User-Agent: {{userAgent}}
+Authorization: Bearer {{login.response.body.access}}
+
+### CREAR UN RESUME
+
+POST  {{host}}/{{version}}/templates/
+Content-Type: application/json
+User-Agent: {{userAgent}}
+Authorization: Bearer {{login.response.body.access}}
+
+{
+  "name": "template nuevo",
+  "descripcion": "El siguiente template es un nuevo estilo moderno",
+  "componet_name": "template_moderno_02",
+  "customization_rules": {"color":["yellow", "black", "white"],"margins":{"min":1,"max":24}, "font_size":{"min":1,"max":24}}
+}
+
+

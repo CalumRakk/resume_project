@@ -5,8 +5,10 @@ from rest_framework import serializers
 from django.core.validators import EmailValidator
 from django.db.models import Model
 from django.db import transaction
+from jsonschema import validate, ValidationError
 
 from .models import Resume, Skill, Experience, Template, ResumeCustomization
+from .utils import SchemaLoader
 
 
 logger = logging.getLogger(__name__)
@@ -58,9 +60,16 @@ class TemplateSerializer(serializers.ModelSerializer):
         model = Template
         fields = ["id", "name", "descripcion", "componet_name", "customization_rules"]
 
-    def validate(self, attrs):
-        logger.info(f"Validando datos de Template: {attrs}")
-        return super().validate(attrs)
+    def validate_customization_rules(self, value):
+        """Valida customization_rules usando JSON Schema cargado en memoria."""
+        schema = SchemaLoader.load_schema("customization_rules.json")
+        try:
+            validate(instance=value, schema=schema)
+        except ValidationError as e:
+            raise serializers.ValidationError(
+                f"Error en customization_rules: {e.message}"
+            )
+        return value
 
 
 class ResumeCustomizationSerializer(serializers.ModelSerializer):

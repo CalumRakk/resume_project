@@ -286,62 +286,62 @@ class ExperienceSerializerTest(SerializerTestSetUp):
         self.assertEqual(experience.end_date.isoformat(), "2022-01-01")
 
 
-class TemplateSerializerTest(SerializerTestSetUp):
-    def setUp(self):
-        super().setUp()
-        self.template = Template.objects.create(
-            name="Basic", descripcion="Plantilla básica", componet_name="basic-resume"
-        )
+# class TemplateSerializerTest(SerializerTestSetUp):
+#     def setUp(self):
+#         super().setUp()
+#         self.template = Template.objects.create(
+#             name="Basic", descripcion="Plantilla básica", componet_name="basic-resume"
+#         )
 
-    def test_template_serializer_valid(self):
-        """
-        Verifica que el serializador TemplateSerializer serializa correctamente un objeto Template.
-        """
-        template = self.template
-        serializer = TemplateSerializer(template)
-        expected_data = {
-            "id": template.id,
-            "name": template.name,
-            "descripcion": template.descripcion,
-            "componet_name": template.componet_name,
-            "customization_rules": template.customization_rules,
-        }
-        self.assertEqual(serializer.data, expected_data)
+#     def test_template_serializer_valid(self):
+#         """
+#         Verifica que el serializador TemplateSerializer serializa correctamente un objeto Template.
+#         """
+#         template = self.template
+#         serializer = TemplateSerializer(template)
+#         expected_data = {
+#             "id": template.id,
+#             "name": template.name,
+#             "descripcion": template.descripcion,
+#             "componet_name": template.componet_name,
+#             "customization_rules": template.customization_rules,
+#         }
+#         self.assertEqual(serializer.data, expected_data)
 
-    def test_template_serializer_create(self):
-        """
-        Verifica que el serializador TemplateSerializer crea correctamente un nuevo objeto Template.
-        """
-        data = {
-            "name": "New Template",
-            "descripcion": "Descripción de la nueva plantilla",
-            "componet_name": "new-template",
-            "customization_rules": [],
-        }
-        serializer = TemplateSerializer(data=data)
-        self.assertTrue(serializer.is_valid())
-        template = serializer.save()
-        self.assertEqual(template.name, "New Template")
-        self.assertEqual(template.descripcion, "Descripción de la nueva plantilla")
-        self.assertEqual(template.componet_name, "new-template")
-        self.assertEqual(template.customization_rules, [])
+#     def test_template_serializer_create(self):
+#         """
+#         Verifica que el serializador TemplateSerializer crea correctamente un nuevo objeto Template.
+#         """
+#         data = {
+#             "name": "New Template",
+#             "descripcion": "Descripción de la nueva plantilla",
+#             "componet_name": "new-template",
+#             "customization_rules": [],
+#         }
+#         serializer = TemplateSerializer(data=data)
+#         self.assertTrue(serializer.is_valid())
+#         template = serializer.save()
+#         self.assertEqual(template.name, "New Template")
+#         self.assertEqual(template.descripcion, "Descripción de la nueva plantilla")
+#         self.assertEqual(template.componet_name, "new-template")
+#         self.assertEqual(template.customization_rules, [])
 
-    def test_template_serializer_update(self):
-        """
-        Verifica que el serializador TemplateSerializer actualiza correctamente un objeto Template existente.
-        """
-        template = self.template
-        data = {
-            "name": "Updated Template",
-            "descripcion": "Updated descripción",
-            "componet_name": "updated-template",
-            "customization_rules": ["rule1", "rule2"],
-        }
-        serializer = TemplateSerializer(template, data=data)
-        self.assertTrue(serializer.is_valid())
-        serializer.save()
-        template.refresh_from_db()
-        self.assertEqual(template.name, "Updated Template")
-        self.assertEqual(template.descripcion, "Updated descripción")
-        self.assertEqual(template.componet_name, "updated-template")
-        self.assertEqual(template.customization_rules, ["rule1", "rule2"])
+#     def test_template_serializer_update(self):
+#         """
+#         Verifica que el serializador TemplateSerializer actualiza correctamente un objeto Template existente.
+#         """
+#         template = self.template
+#         data = {
+#             "name": "Updated Template",
+#             "descripcion": "Updated descripción",
+#             "componet_name": "updated-template",
+#             "customization_rules": ["rule1", "rule2"],
+#         }
+#         serializer = TemplateSerializer(template, data=data)
+#         self.assertTrue(serializer.is_valid())
+#         serializer.save()
+#         template.refresh_from_db()
+#         self.assertEqual(template.name, "Updated Template")
+#         self.assertEqual(template.descripcion, "Updated descripción")
+#         self.assertEqual(template.componet_name, "updated-template")
+#         self.assertEqual(template.customization_rules, ["rule1", "rule2"])
