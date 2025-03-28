@@ -10,13 +10,13 @@ SCHEMA_DIR = settings.BASE_DIR / "resume_app" / "schemas"
 
 
 class SchemaLoader:
-    """Singleton para cargar y almacenar los esquemas JSON en memoria."""
+    """Singleton to load and store JSON schemas in memory."""
 
     _schemas = {}
 
     @classmethod
     def load_schema(cls, filename: str):
-        """Carga un esquema solo si aún no está en memoria."""
+        """Loads a schema only if it's not already in memory."""
         if filename not in cls._schemas:
             schema_path = SCHEMA_DIR / filename
             try:
@@ -31,23 +31,23 @@ class SchemaLoader:
 def is_valid_webcomponent(name):
     if bool(webcomponent_regex.fullmatch(name)) is False:
         raise ValidationError(
-            f"El nombre del componente {name} no es válido. Debe estar en minúsculas, contener al menos un guion (`-`), "
-            "y no debe comenzar ni terminar con un número o un guion. "
-            "app-component ✅ Válido. "
-            "app-name-component ✅ Válido. "
-            "component123 ❌ Inválido. "
-            "App-Component ❌ Inválido. "
-            "singleword ❌ Inválido."
+            f"The component name {name} is not valid. It must be in lowercase, contain at least one hyphen (`-`), "
+            "and must not start or end with a number or a hyphen. "
+            "app-component ✅ Valid. "
+            "app-name-component ✅ Valid. "
+            "component123 ❌ Invalid. "
+            "App-Component ❌ Invalid. "
+            "singleword ❌ Invalid."
         )
     return True
 
 
 def check_list_does_not_exceed_50(value):
     if not isinstance(value, list):
-        raise ValidationError("El campo debe ser una lista.")
+        raise ValidationError("The field must be a list.")
 
     if len(value) > 50:
-        raise ValidationError("La lista debe tener menos de 50 elementos.")
+        raise ValidationError("The list must have less than 50 elements.")
 
 
 def is_ip_in_range(user_ip, allowed_range):

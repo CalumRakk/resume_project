@@ -6,15 +6,15 @@ from django.db.models import Prefetch, F
 
 class BaseModel(models.Model):
     """
-    Modelo base abstracto que proporciona las columnas `created_at` y `updated_at`
-    para registrar fechas de creación y modificación de los registros.
+    Abstract base model that provides the `created_at` and `updated_at` columns
+    to record creation and modification dates of the records.
     """
 
     created_at = models.DateTimeField(
-        auto_now_add=True, help_text="Fecha de creación del registro."
+        auto_now_add=True, help_text="Date the record was created."
     )
     updated_at = models.DateTimeField(
-        auto_now=True, help_text="Fecha de última modificación del registro."
+        auto_now=True, help_text="Date the record was last modified."
     )
 
     class Meta:
@@ -26,18 +26,18 @@ class BaseModel(models.Model):
 
 class Resume(BaseModel):
     """
-    Modelo que representa un resumen.
+    Model that represents a resume.
     """
 
     full_name = models.CharField(
-        max_length=100, null=True, help_text="Nombre completo del usuario."
+        max_length=100, null=True, help_text="Full name of the user."
     )
     email = models.EmailField(
-        null=True, help_text="Correo electrónico asociado al resumen."
+        null=True, help_text="Email address associated with the resume."
     )
     summary = models.TextField(
         null=True,
-        help_text="Resumen o descripción general del usuario.",
+        help_text="Summary or general description of the user.",
         max_length=500,
     )
     template_selected = models.ForeignKey(
@@ -45,34 +45,34 @@ class Resume(BaseModel):
         on_delete=models.CASCADE,
         related_name="resumes",
         null=True,
-        help_text="Plantilla seleccionada para la visualización del resumen.",
+        help_text="Template selected for the display of the resume.",
     )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="resumes",
-        help_text="Usuario dueño del resumen.",
+        help_text="User owning the resume.",
     )
 
     class Meta:
-        verbose_name = "Resumen"
-        verbose_name_plural = "Resúmenes"
+        verbose_name = "Resume"
+        verbose_name_plural = "Resumes"
 
     @classmethod
     def get_with_customization(cls, user):
         """
-        Obtiene la lista de resumes del usuario, prefetching la
-        personalización (`ResumeCustomization`) asociada con cada resume.
+        Gets the list of the user's resumes, prefetching the
+        customization (`ResumeCustomization`) associated with each resume.
 
-        - Usa `select_related("template_selected")` para evitar consultas extra
-        al acceder a la relación con `Template`.
-        - Usa `prefetch_related` con `Prefetch` para cargar las personalizaciones
-        (`ResumeCustomization`) que coinciden con el template seleccionado de cada resume.
-        - Convierte `customization_list` en un solo objeto `customization` para
-        facilitar el acceso directo en las vistas.
+        - Uses `select_related("template_selected")` to avoid extra queries
+        when accessing the relationship with `Template`.
+        - Uses `prefetch_related` with `Prefetch` to load the customizations
+        (`ResumeCustomization`) that match the selected template for each resume.
+        - Converts `customization_list` to a single `customization` object to
+        facilitate direct access in the views.
 
         Returns:
-            QuerySet: Lista de objetos `Resume`, cada uno con su `customization` precargado.
+            QuerySet: List of `Resume` objects, each with its `customization` preloaded.
         """
         resumes = (
             Resume.objects.filter(user=user)
@@ -98,137 +98,137 @@ class Resume(BaseModel):
 
 class Skill(BaseModel):
     """
-    Representa una habilidad dentro del resumen.
+    Represents a skill within the resume.
     """
 
     name = models.CharField(
-        max_length=100, default="Web Development", help_text="Nombre de la habilidad."
+        max_length=100, default="Web Development", help_text="Name of the skill."
     )
     resume = models.ForeignKey(
         Resume,
         on_delete=models.CASCADE,
         related_name="skills",
-        help_text="Resumen al que pertenece la habilidad.",
+        help_text="Resume to which the skill belongs.",
     )
     keywords = models.JSONField(
         default=list,
         null=True,
-        help_text="Palabras clave asociadas a la habilidad.",
+        help_text="Keywords associated with the skill.",
         validators=[check_list_does_not_exceed_50],
     )
     level = models.CharField(
         default="Master",
         max_length=100,
         null=True,
-        help_text="Nivel de la habilidad (Ej: Básico, Avanzado, Experto).",
+        help_text="Skill level (e.g., Basic, Advanced, Expert).",
     )
 
     class Meta:
-        verbose_name = "Habilidad"
-        verbose_name_plural = "Habilidades"
+        verbose_name = "Skill"
+        verbose_name_plural = "Skills"
 
 
 class Experience(BaseModel):
     """
-    Representa una experiencia laboral dentro del resumen.
+    Represents a work experience within the resume.
     """
 
     name = models.CharField(
         max_length=100,
         default="Company Name",
-        help_text="Nombre de la empresa u organización.",
+        help_text="Name of the company or organization.",
     )
     position = models.CharField(
         max_length=100,
         default="President",
-        help_text="Puesto desempeñado en la empresa.",
+        help_text="Position held in the company.",
     )
-    start_date = models.DateField(help_text="Fecha de inicio del empleo.")
+    start_date = models.DateField(help_text="Employment start date.")
     resume = models.ForeignKey(
         Resume,
         on_delete=models.CASCADE,
         related_name="experiences",
-        help_text="Resumen al que pertenece la experiencia.",
+        help_text="Resume to which the experience belongs.",
     )
     url = models.URLField(
         default="https://company.com",
         null=True,
-        help_text="Enlace a la empresa",
+        help_text="Link to the company",
         max_length=100,
     )
     summary = models.TextField(
         default="Description…",
         null=True,
-        help_text="Descripción general de la experiencia laboral.",
+        help_text="General description of the work experience.",
         max_length=500,
     )
     highlights = models.JSONField(
         default=list,
         null=True,
-        help_text="Lista de Aspectos destacados del trabajo.",
+        help_text="List of highlights of the job.",
         validators=[check_list_does_not_exceed_50],
     )
     end_date = models.DateField(
         null=True,
-        help_text="Fecha de finalización del empleo. NULL si aún está en curso.",
+        help_text="Employment end date. NULL if still in progress.",
     )
 
     class Meta:
-        verbose_name = "Experiencia"
-        verbose_name_plural = "Experiencias"
+        verbose_name = "Experience"
+        verbose_name_plural = "Experiences"
 
 
 class Template(BaseModel):
     """
-    Representa una plantilla de diseño para los resúmenes.
+    Represents a design template for resumes.
     """
 
-    name = models.CharField(max_length=100, help_text="Nombre de la plantilla.")
+    name = models.CharField(max_length=100, help_text="Name of the template.")
     componet_name = models.CharField(
         max_length=100,
-        help_text="Nombre del componente web asociado a la plantilla.",
+        help_text="Name of the web component associated with the template.",
         validators=[is_valid_webcomponent],
     )
     customization_rules = models.JSONField(
-        default=dict, help_text="Reglas de personalización de la plantilla."
+        default=dict, help_text="Template customization rules."
     )
     descripcion = models.TextField(
-        null=True, help_text="Descripción de la plantilla.", max_length=500
+        null=True, help_text="Description of the template.", max_length=500
     )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="templates",
-        help_text="Usuario creador del template.",
+        help_text="User creating the template.",
     )
 
     class Meta:
-        verbose_name = "Plantilla"
-        verbose_name_plural = "Plantillas"
+        verbose_name = "Template"
+        verbose_name_plural = "Templates"
 
 
 class ResumeCustomization(BaseModel):
     """
-    Representa una personalización aplicada a un resumen con una plantilla específica.
+    Represents a customization applied to a resume with a specific template.
     """
 
     resume = models.ForeignKey(
         Resume,
         on_delete=models.CASCADE,
-        help_text="Resumen al que se aplica la personalización.",
+        help_text="Resume to which the customization is applied.",
     )
     template = models.ForeignKey(
         Template,
         on_delete=models.CASCADE,
-        help_text="Plantilla seleccionada para la personalización.",
+        help_text="Template selected for customization.",
     )
     custom_styles = models.JSONField(
-        default=dict, help_text="Estilos personalizados aplicados al resumen."
+        default=dict, help_text="Custom styles applied to the resume."
     )
 
     class Meta:
-        verbose_name = "Personalización de Resumen"
-        verbose_name_plural = "Personalización de Resúmenes"
+        verbose_name = "Resume Customization"
+        verbose_name_plural = "Resume Customizations"
         constraints = [
             models.UniqueConstraint(
                 fields=["resume", "template"],

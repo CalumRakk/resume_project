@@ -1,73 +1,73 @@
-## Un punto de partida para interactuar con la API
+## A starting point for interacting with the API
 
-**Consideraciones generales antes de empezar:**
+**General considerations before starting:**
 
-- **Autenticación:** La mayoría de los endpoints requieren autenticación mediante JWT. Después de iniciar sesión (`/v1/login/`) recibirás un token de acceso y un token de refresco. Incluye el token de acceso en la cabecera `Authorization` de tus peticiones, así: `Authorization: Bearer <tu_token_de_acceso>`.
-- **Tokens de refresco:** Los tokens de acceso tienen una duración limitada. Utiliza el endpoint `/v1/refresh-token/` con el token de refresco para obtener un nuevo token de acceso cuando el actual expire.
-- **Verbos HTTP:** La API sigue los principios REST. Usa los verbos HTTP (GET, POST, PUT, DELETE) de manera semántica para realizar operaciones en los recursos.
-- **Formato de datos:** La API espera y responde con datos en formato JSON.
+- **Authentication:** Most endpoints require authentication via JWT. After logging in (`/v1/login/`) you will receive an access token and a refresh token. Include the access token in the `Authorization` header of your requests, like this: `Authorization: Bearer <your_access_token>`.
+- **Refresh Tokens:** Access tokens have a limited lifespan. Use the `/v1/refresh-token/` endpoint with the refresh token to obtain a new access token when the current one expires.
+- **HTTP Verbs:** The API follows REST principles. Use HTTP verbs (GET, POST, PUT, DELETE) semantically to perform operations on resources.
+- **Data Format:** The API expects and responds with data in JSON format.
 
-## **Endpoints principales:**
+## **Main Endpoints:**
 
-A continuación, verás las URLs disponibles, recuerda que todas están dentro del scope `/v1/`
+Below you will see the available URLs, remember that they are all within the `/v1/` scope.
 
-| Método | Endpoint             | Descripción                                                                                                                                                |
-| :----- | :------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| POST   | `/v1/login/`         | Obtiene un token de acceso y un token de refresco para un usuario autenticado.                                                                             |
-| POST   | `/v1/refresh-token/` | Refresca un token de acceso utilizando un token de refresco.                                                                                               |
-| GET    | `/v1/resumes/`       | Lista todos los resumes del usuario autenticado.                                                                                                           |
-| POST   | `/v1/resumes/`       | Crea un nuevo resume para el usuario autenticado.                                                                                                          |
-| GET    | `/v1/resumes/<id>/`  | Obtiene los detalles de un resume específico (identificado por `id`) del usuario autenticado.                                                              |
-| PUT    | `/v1/resumes/<id>/`  | **Reemplaza** completamente un resume existente (identificado por `id`) con los datos proporcionados. ¡Es importante enviar _todos_ los campos del resume! |
-| DELETE | `/v1/resumes/<id>/`  | Elimina un resume específico (identificado por `id`) del usuario autenticado.                                                                              |
-| GET    | `/v1/templates/`     | Lista todos los templates disponibles.                                                                                                                     |
-| PATCH  | `/v1/templates/`     | Actualiza el template seleccionado para un resumen específico. Envia un JSON con los campos `resume_id` y `template_selected`.                             |
+| Method | Endpoint             | Description                                                                                                                         |
+| :----- | :------------------- | :---------------------------------------------------------------------------------------------------------------------------------- |
+| POST   | `/v1/login/`         | Obtains an access token and a refresh token for an authenticated user.                                                              |
+| POST   | `/v1/refresh-token/` | Refreshes an access token using a refresh token.                                                                                    |
+| GET    | `/v1/resumes/`       | Lists all resumes of the authenticated user.                                                                                        |
+| POST   | `/v1/resumes/`       | Creates a new resume for the authenticated user.                                                                                    |
+| GET    | `/v1/resumes/<id>/`  | Gets the details of a specific resume (identified by `id`) of the authenticated user.                                               |
+| PUT    | `/v1/resumes/<id>/`  | **Completely replaces** an existing resume (identified by `id`) with the provided data. It's important to send _all_ resume fields! |
+| DELETE | `/v1/resumes/<id>/`  | Deletes a specific resume (identified by `id`) of the authenticated user.                                                           |
+| GET    | `/v1/templates/`     | Lists all available templates.                                                                                                      |
+| PATCH  | `/v1/templates/`     | Updates the selected template for a specific resume. Send a JSON with the `resume_id` and `template_selected` fields.               |
 
-**Ejemplo de interacción (Crear un resume):**
+**Interaction Example (Creating a resume):**
 
-1.  **Obtener un token:**
+1.  **Obtain a token:**
 
     ```http
     POST /v1/login/
     Content-Type: application/json
 
     {
-      "username": "usuario",
-      "password": "contraseña"
+      "username": "username",
+      "password": "password"
     }
     ```
 
-    Respuesta:
+    Response:
 
     ```json
     {
-      "access": "token_de_acceso",
-      "refresh": "token_de_refresco"
+      "access": "access_token",
+      "refresh": "refresh_token"
     }
     ```
 
-2.  **Crear un resume:**
+2.  **Create a resume:**
 
     ```http
     POST /v1/resumes/
     Content-Type: application/json
-    Authorization: Bearer <token_de_acceso>
+    Authorization: Bearer <access_token>
 
     {
       "full_name": "John Doe",
       "email": "john.doe@example.com",
-      "summary": "Desarrollador web con experiencia...",
+      "summary": "Web developer with experience...",
       "template_selected": 1,
       "skills": [
-        {"name": "JavaScript", "level": "Experto", "orden": 0},
-        {"name": "React", "level": "Avanzado", "orden": 1}
+        {"name": "JavaScript", "level": "Expert", "orden": 0},
+        {"name": "React", "level": "Advanced", "orden": 1}
       ],
       "experiences": [
         {
-          "name": "Empresa XYZ",
-          "position": "Desarrollador Frontend",
-          "url": "https://www.empresa.com",
-          "summary": "Desarrollé interfaces de usuario...",
+          "name": "Company XYZ",
+          "position": "Frontend Developer",
+          "url": "https://www.company.com",
+          "summary": "I developed user interfaces...",
           "start_date": "2023-01-01",
           "end_date": "2024-01-01",
           "orden": 0
@@ -76,18 +76,18 @@ A continuación, verás las URLs disponibles, recuerda que todas están dentro d
     }
     ```
 
-    Respuesta:
+    Response:
 
     ```json
     {
       "id": 123,
       "full_name": "John Doe",
       "email": "john.doe@example.com",
-      "summary": "Desarrollador web con experiencia...",
+      "summary": "Web developer with experience...",
       "template_selected": {
         "id": 1,
         "name": "Modern",
-        "descripcion": "Plantilla moderna...",
+        "descripcion": "Modern template...",
         "componet_name": "modern-resume",
         "customization_rules": []
       },
@@ -99,28 +99,28 @@ A continuación, verás las URLs disponibles, recuerda que todas están dentro d
     }
     ```
 
-## **Panel de Administración de Django:**
+## **Django Administration Panel:**
 
-El proyecto incluye un panel de administración de Django (`/admin/`) que permite:
+The project includes a Django administration panel (`/admin/`) that allows:
 
-- Gestionar usuarios y permisos.
-- Crear, editar y eliminar resumes, plantillas, habilidades y experiencias directamente en la base de datos.
-- Tener una visión general de todos los datos del sistema.
+- Manage users and permissions.
+- Create, edit, and delete resumes, templates, skills, and experiences directly in the database.
+- Get an overview of all the system's data.
 
-## **Vista de Logs:**
+## **Logs View:**
 
-Para facilitar la depuración y el monitoreo del sistema, está disponible la vista de logs accesible en el endpoint **`/logs/`**. En `/logs/` puedes ver el registro de gran parte de las acciones realizadas y también te permite:
+To facilitate debugging and monitoring of the system, the logs view is available at the endpoint **`/logs/`**. In `/logs/` you can see the recording of most of the actions performed and it also allows you to:
 
-- Visualizar los últimos registros del sistema directamente desde el navegador.
-- Descargar el archivo de logs completo para un análisis más detallado.
+- Visualize the latest system logs directly from the browser.
+- Download the complete logs file for more detailed analysis.
 
-## **Documentación Swagger**
+## **Swagger Documentation**
 
-El proyecto incluye la documentación con Swagger. Puedes acceder a ella visitando el endpoint `/v1/swagger/`.
+The project includes documentation with Swagger. You can access it by visiting the endpoint `/v1/swagger/`.
 
-Swagger te proporciona:
+Swagger provides you with:
 
-- Una interfaz interactiva para explorar todos los endpoints de la API.
-- Detalles de los parámetros que cada endpoint espera.
-- Ejemplos de solicitudes y respuestas JSON.
-- La posibilidad de probar los endpoints directamente desde el navegador.
+- An interactive interface to explore all API endpoints.
+- Details of the parameters that each endpoint expects.
+- Examples of JSON requests and responses.
+- The ability to test endpoints directly from the browser.
